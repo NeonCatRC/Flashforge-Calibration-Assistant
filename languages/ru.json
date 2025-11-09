@@ -136,10 +136,7 @@
     "max_adjustment": "Макс. регулировка (мм):",
     "tape_thickness": "Толщина скотча (мм):",
     "belt_tooth_mm": "Шаг ремня на зуб (мм):",
-<<<<<<< HEAD
     "corner_averaging": "Сглаживание углов (точек):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
     "screw_mode_label": "Как регулируем:",
     "screw_mode_hold_nut": "Крутим винты, держим гайки",
     "screw_mode_hold_screw": "Крутим гайки, держим винты",
@@ -149,10 +146,7 @@
     "host": "Хост:",
     "username": "Пользователь:",
     "password": "Пароль:",
-<<<<<<< HEAD
     "printer_cfg_path": "Путь к printer.cfg (необязательно):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
     "test_connection": "Проверить подключение",
     "get_printer_cfg": "Получить printer.cfg",
     "get_shapers": "Получить шейперы",
