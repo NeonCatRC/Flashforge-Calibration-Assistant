@@ -62,18 +62,12 @@ class SSHTab(QWidget):
         self.user_input = QLineEdit(self._current_settings.username)
         self.password_input = QLineEdit(self._current_settings.password)
         self.password_input.setEchoMode(QLineEdit.Password)
-<<<<<<< HEAD
         self.path_input = QLineEdit(self._current_settings.printer_cfg_path or "")
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
         form_layout.addRow(self.localization.translate("settings_tab.host"), self.host_input)
         form_layout.addRow(self.localization.translate("settings_tab.username"), self.user_input)
         form_layout.addRow(self.localization.translate("settings_tab.password"), self.password_input)
-<<<<<<< HEAD
         form_layout.addRow(self.localization.translate("settings_tab.printer_cfg_path"), self.path_input)
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
         layout.addWidget(credentials_frame)
 
@@ -151,11 +145,7 @@ class SSHTab(QWidget):
         try:
             client = self._create_client()
             with SCPClient(client.get_transport()) as scp:
-<<<<<<< HEAD
                 remote_paths = self._build_remote_paths()
-=======
-                remote_paths = ["/opt/config/printer.cfg", "/root/printer_data/config/printer.cfg"]
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 local_path = Path("config/printer.cfg")
                 local_path.parent.mkdir(parents=True, exist_ok=True)
                 last_error = None
@@ -205,7 +195,6 @@ class SSHTab(QWidget):
             self._append_log(tr("settings_tab.connection_error").format(str(exc)))
 
     # ------------------------------------------------------------------ persistence
-<<<<<<< HEAD
     def _build_remote_paths(self) -> list[str]:
         custom = self.path_input.text().strip()
         defaults = [
@@ -223,15 +212,10 @@ class SSHTab(QWidget):
                 seen.append(path)
         return seen
 
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
     def save_credentials(self) -> None:
         ssh_settings = self.app_state.current_settings.ssh
         ssh_settings.host = self.host_input.text().strip()
         ssh_settings.username = self.user_input.text().strip()
         ssh_settings.password = self.password_input.text()
-<<<<<<< HEAD
         ssh_settings.printer_cfg_path = self.path_input.text().strip()
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         self.app_state.save_settings()

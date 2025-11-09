@@ -134,10 +134,7 @@ class SettingsView(QWidget):
         self._add_line_edit(form, self.localization.translate("settings_tab.max_adjustment"), hw.max_adjustment, self.hardware_fields, "max_adjustment")
         self._add_line_edit(form, self.localization.translate("settings_tab.tape_thickness"), hw.tape_thickness, self.hardware_fields, "tape_thickness")
         self._add_line_edit(form, self.localization.translate("settings_tab.belt_tooth_mm"), hw.belt_tooth_mm, self.hardware_fields, "belt_tooth_mm")
-<<<<<<< HEAD
         self._add_line_edit(form, self.localization.translate("settings_tab.corner_averaging"), hw.corner_averaging, self.hardware_fields, "corner_averaging")
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
         mode_widget = QWidget()
         mode_layout = QHBoxLayout(mode_widget)
@@ -243,14 +240,10 @@ class SettingsView(QWidget):
         try:
             hardware = self.settings.hardware
             for key, edit in self.hardware_fields.items():
-<<<<<<< HEAD
                 value = float(edit.text())
                 if key == "corner_averaging":
                     value = max(0, int(value))
                 setattr(hardware, key, value)
-=======
-                setattr(hardware, key, float(edit.text()))
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             hardware.screw_mode = self._selected_screw_mode()
 
             thresholds = self.settings.thresholds

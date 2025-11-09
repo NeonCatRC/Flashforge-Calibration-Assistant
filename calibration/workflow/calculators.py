@@ -20,14 +20,8 @@ BACK_SHAFT_GAIN = 0.4
 
 
 def compute_stage_deviation(mesh: np.ndarray) -> float:
-<<<<<<< HEAD
     """Return the total height span (max - min) to match UI deviation metrics."""
     return float(np.max(mesh) - np.min(mesh))
-=======
-    """Return the maximum absolute deviation from the mean height."""
-    mean = float(np.mean(mesh))
-    return float(np.max(np.abs(mesh - mean)))
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
 
 def compute_initial_stage(mesh: np.ndarray) -> StageResult:

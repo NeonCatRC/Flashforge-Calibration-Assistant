@@ -361,16 +361,12 @@ class BedLevelingView(QWidget):
         if not file_path:
             return
 
-<<<<<<< HEAD
         self.heatmap_canvas.figure.savefig(
             file_path,
             facecolor="white",
             bbox_inches="tight",
             pad_inches=0.2,
         )
-=======
-        self.heatmap_canvas.figure.savefig(file_path)
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         QMessageBox.information(
             self,
             tr("neo_ui.common.success"),

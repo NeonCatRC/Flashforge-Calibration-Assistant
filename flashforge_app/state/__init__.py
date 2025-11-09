@@ -70,10 +70,7 @@ class AppState:
 
             self.workspace.screw_solver.set_screw_config(screw_config)
             self.workspace.analyzer.set_screw_config(screw_config)
-<<<<<<< HEAD
             self.workspace.analyzer.set_corner_averaging_size(hw.corner_averaging)
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             self.workspace.analyzer.screw_threshold = thresholds.screw_threshold
             self.workspace.analyzer.tape_threshold = thresholds.tape_threshold
             self.workspace.tape_calculator.tape_thickness = hw.tape_thickness
@@ -106,10 +103,7 @@ class AppState:
 
         analyzer = DeviationAnalyzer(
             bed,
-<<<<<<< HEAD
             corner_averaging_size=hw.corner_averaging,
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             screw_threshold=thresholds.screw_threshold,
             tape_threshold=thresholds.tape_threshold,
             screw_config=screw_config,
@@ -145,10 +139,7 @@ class AppState:
                 "screw_pitch": self.current_settings.hardware.screw_pitch,
                 "min_adjustment": self.current_settings.hardware.min_adjustment,
                 "max_adjustment": self.current_settings.hardware.max_adjustment,
-<<<<<<< HEAD
                 "corner_averaging": self.current_settings.hardware.corner_averaging,
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             },
             "thresholds": {
                 "belt_threshold": self.current_settings.thresholds.belt_threshold,

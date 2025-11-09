@@ -19,32 +19,19 @@ class VisualizationSettings:
 @dataclass
 class HardwareSettings:
     screw_pitch: float = 0.7
-<<<<<<< HEAD
     min_adjustment: float = 0.02
     max_adjustment: float = 4.0
     tape_thickness: float = 0.06
     belt_tooth_mm: float = 0.4
     corner_averaging: int = 0
-=======
-    min_adjustment: float = 0.1
-    max_adjustment: float = 2.0
-    tape_thickness: float = 0.06
-    belt_tooth_mm: float = 0.4
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
     screw_mode: str = "hold_nut"
 
 
 @dataclass
 class ThresholdSettings:
-<<<<<<< HEAD
     belt_threshold: float = 0.4
     screw_threshold: float = 0.19
     tape_threshold: float = 0.01
-=======
-    belt_threshold: float = 0.6
-    screw_threshold: float = 0.4
-    tape_threshold: float = 0.2
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
 
 @dataclass
@@ -79,10 +66,7 @@ class SSHSettings:
     host: str = ""
     username: str = ""
     password: str = ""
-<<<<<<< HEAD
     printer_cfg_path: str = ""
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
 
 @dataclass

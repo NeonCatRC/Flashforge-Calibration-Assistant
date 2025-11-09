@@ -347,16 +347,11 @@ class MainWindow:
                     max_adjust=settings['hardware']['max_adjustment']
                 )
 
-<<<<<<< HEAD
                 corner_avg = int(settings['hardware'].get('corner_averaging', 0))
 
                 self.analyzer = DeviationAnalyzer(
                     self.bed,
                     corner_averaging_size=corner_avg,
-=======
-                self.analyzer = DeviationAnalyzer(
-                    self.bed,
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                     screw_threshold=settings['thresholds']['screw_threshold'],
                     tape_threshold=settings['thresholds']['tape_threshold'],
                     screw_config=screw_config
@@ -401,14 +396,10 @@ class MainWindow:
             max_adjust=settings['hardware']['max_adjustment']
         )
 
-<<<<<<< HEAD
         corner_avg = int(settings['hardware'].get('corner_averaging', 0))
 
         self.analyzer.set_screw_config(screw_config)
         self.analyzer.set_corner_averaging_size(corner_avg)
-=======
-        self.analyzer.set_screw_config(screw_config)
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         self.screw_solver.set_screw_config(screw_config)
         self.tape_calculator.tape_thickness = settings['hardware']['tape_thickness']
         self.tape_calculator.min_height_diff = settings['thresholds']['tape_threshold']

@@ -135,10 +135,7 @@
     "max_adjustment": "Max adjustment (mm):",
     "tape_thickness": "Tape thickness (mm):",
     "belt_tooth_mm": "Belt pitch per tooth (mm):",
-<<<<<<< HEAD
     "corner_averaging": "Corner averaging window (points):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
     "screw_mode_label": "Adjustment orientation:",
     "screw_mode_hold_nut": "Turn screws, hold nuts",
     "screw_mode_hold_screw": "Turn nuts, hold screws",
@@ -148,10 +145,7 @@
     "host": "Host:",
     "username": "Username:",
     "password": "Password:",
-<<<<<<< HEAD
     "printer_cfg_path": "Custom printer.cfg path (optional):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
     "test_connection": "Test Connection",
     "get_printer_cfg": "Get printer.cfg",
     "get_shapers": "Get shapers",

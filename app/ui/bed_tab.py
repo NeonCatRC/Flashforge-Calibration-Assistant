@@ -206,14 +206,9 @@ class BedLevelingTab(ttk.Frame):
             container_height = int(self.winfo_height() * 0.8)
         
         dpi = 96
-<<<<<<< HEAD
         # Расширяем фигуру пропорционально размеру контейнера, но оставляем небольшой внутренний отступ
         fig_width = max(4.0, (container_width / dpi) * 0.95)
         fig_height = max(3.0, (container_height / dpi) * 0.95)
-=======
-        fig_width = min(container_width / dpi * 0.9, 7.0)
-        fig_height = min(container_height / dpi * 0.9, 5.5)
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         
         print(f"Container size: {container_width}x{container_height}, Figure size: {fig_width}x{fig_height} inches")
         

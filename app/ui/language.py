@@ -176,20 +176,14 @@ class LanguageManager:
                 "max_adjustment": "Max adjustment (mm):",
                 "tape_thickness": "Tape thickness (mm):",
                 "belt_tooth_mm": "Belt pitch per tooth (mm):",
-<<<<<<< HEAD
                 "corner_averaging": "Corner averaging window (points):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 "belt_threshold": "Belt adjustment threshold (mm):",
                 "screw_threshold": "Screw threshold (mm):",
                 "tape_threshold": "Tape threshold (mm):",
                 "host": "Host:",
                 "username": "Username:",
                 "password": "Password:",
-<<<<<<< HEAD
                 "printer_cfg_path": "Custom printer.cfg path (optional):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 "test_connection": "Test Connection",
                 "get_printer_cfg": "Get printer.cfg",
                 "get_shapers": "Get shapers",
@@ -484,20 +478,14 @@ class LanguageManager:
                 "max_adjustment": "Макс. регулировка (мм):",
                 "tape_thickness": "Толщина скотча (мм):",
                 "belt_tooth_mm": "Шаг ремня на зуб (мм):",
-<<<<<<< HEAD
                 "corner_averaging": "Сглаживание углов (точек):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 "belt_threshold": "Порог регулировки валов (мм):",
                 "screw_threshold": "Порог винтов (мм):",
                 "tape_threshold": "Порог скотча (мм):",
                 "host": "Хост:",
                 "username": "Пользователь:",
                 "password": "Пароль:",
-<<<<<<< HEAD
                 "printer_cfg_path": "Путь к printer.cfg (необязательно):",
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 "test_connection": "Проверить подключение",
                 "get_printer_cfg": "Получить printer.cfg",
                 "get_shapers": "Получить шейперы",

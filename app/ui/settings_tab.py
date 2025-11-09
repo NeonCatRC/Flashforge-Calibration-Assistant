@@ -16,7 +16,6 @@ class SettingsTab(ttk.Frame):
         self.settings = {
             'hardware': {
                 'screw_pitch': 0.7,
-<<<<<<< HEAD
                 'min_adjustment': 0.02,
                 'max_adjustment': 4.0,
                 'tape_thickness': 0.06,
@@ -27,27 +26,12 @@ class SettingsTab(ttk.Frame):
                 'belt_threshold': 0.4,
                 'screw_threshold': 0.19,
                 'tape_threshold': 0.01
-=======
-                'min_adjustment': 0.1,
-                'max_adjustment': 2.0,
-                'tape_thickness': 0.06,
-                'belt_tooth_mm': 0.4
-            },
-            'thresholds': {
-                'belt_threshold': 0.6,
-                'screw_threshold': 0.4,
-                'tape_threshold': 0.2
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             },
             'ssh': {
                 'host': '',
                 'username': '',
-<<<<<<< HEAD
                 'password': '',
                 'printer_cfg_path': ''
-=======
-                'password': ''
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             },
             'visualization': {
                 'interpolation_factor': 100,
@@ -98,12 +82,8 @@ class SettingsTab(ttk.Frame):
             (_('settings_tab.min_adjustment'), 'min_adjustment'),
             (_('settings_tab.max_adjustment'), 'max_adjustment'),
             (_('settings_tab.tape_thickness'), 'tape_thickness'),
-<<<<<<< HEAD
             (_('settings_tab.belt_tooth_mm'), 'belt_tooth_mm'),
             (_('settings_tab.corner_averaging'), 'corner_averaging')
-=======
-            (_('settings_tab.belt_tooth_mm'), 'belt_tooth_mm')
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         ]
         
         self.hardware_entries = {}
@@ -156,7 +136,6 @@ class SettingsTab(ttk.Frame):
         self.ssh_user.insert(0, self.settings['ssh']['username'])
         self.ssh_user.pack(fill='x', padx=5, pady=2)
         
-<<<<<<< HEAD
         ttk.Label(frame, text=_('settings_tab.password')).pack(anchor='w', padx=5, pady=2)
         self.ssh_password = ttk.Entry(frame, show='*')
         self.ssh_password.insert(0, self.settings['ssh']['password'])
@@ -166,12 +145,6 @@ class SettingsTab(ttk.Frame):
         self.ssh_printer_path = ttk.Entry(frame)
         self.ssh_printer_path.insert(0, self.settings['ssh'].get('printer_cfg_path', ''))
         self.ssh_printer_path.pack(fill='x', padx=5, pady=2)
-=======
-        ttk.Label(frame, text=_('settings_tab.password')).pack(anchor='w', padx=5, pady=2)
-        self.ssh_password = ttk.Entry(frame, show='*')
-        self.ssh_password.insert(0, self.settings['ssh']['password'])
-        self.ssh_password.pack(fill='x', padx=5, pady=2)
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         
         ttk.Button(frame, text=_('settings_tab.test_connection'), 
                   command=self.test_ssh_connection).pack(pady=10)
@@ -268,16 +241,11 @@ class SettingsTab(ttk.Frame):
                   
     def save_settings(self):
         try:
-<<<<<<< HEAD
             for key, entry in self.hardware_entries.items():
                 value = float(entry.get())
                 if key == 'corner_averaging':
                     value = max(0, int(value))
                 self.settings['hardware'][key] = value
-=======
-            for key, entry in self.hardware_entries.items():
-                self.settings['hardware'][key] = float(entry.get())
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 
             for key, entry in self.threshold_entries.items():
                 self.settings['thresholds'][key] = float(entry.get())
@@ -297,11 +265,8 @@ class SettingsTab(ttk.Frame):
                 for key, var in self.workflow_vars.items():
                     self.settings['workflow'][key] = bool(var.get())
 
-<<<<<<< HEAD
             self.settings['ssh']['printer_cfg_path'] = self.ssh_printer_path.get().strip()
 
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             self.save_settings_to_file()
 
             if not self.settings['visualization']['show_minutes'] and not self.settings['visualization']['show_degrees']:
@@ -329,7 +294,6 @@ class SettingsTab(ttk.Frame):
             self.settings = {
                 'hardware': {
                     'screw_pitch': 0.7,
-<<<<<<< HEAD
                     'min_adjustment': 0.02,
                     'max_adjustment': 4.0,
                     'tape_thickness': 0.06,
@@ -340,27 +304,12 @@ class SettingsTab(ttk.Frame):
                     'belt_threshold': 0.4,
                     'screw_threshold': 0.19,
                     'tape_threshold': 0.01
-=======
-                    'min_adjustment': 0.1,
-                    'max_adjustment': 2.0,
-                    'tape_thickness': 0.06,
-                    'belt_tooth_mm': 0.4
-                },
-                'thresholds': {
-                    'belt_threshold': 0.6,
-                    'screw_threshold': 0.4,
-                    'tape_threshold': 0.2
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 },
                 'ssh': {
                     'host': '',
                     'username': '',
-<<<<<<< HEAD
                     'password': '',
                     'printer_cfg_path': ''
-=======
-                    'password': ''
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
                 },
                 'visualization': {
                     'interpolation_factor': 100,
@@ -391,15 +340,10 @@ class SettingsTab(ttk.Frame):
             self.ssh_host.insert(0, self.settings['ssh']['host'])
             self.ssh_user.delete(0, tk.END)
             self.ssh_user.insert(0, self.settings['ssh']['username'])
-<<<<<<< HEAD
             self.ssh_password.delete(0, tk.END)
             self.ssh_password.insert(0, self.settings['ssh']['password'])
             self.ssh_printer_path.delete(0, tk.END)
             self.ssh_printer_path.insert(0, self.settings['ssh']['printer_cfg_path'])
-=======
-            self.ssh_password.delete(0, tk.END)
-            self.ssh_password.insert(0, self.settings['ssh']['password'])
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
             
             self.interpolation.delete(0, tk.END)
             self.interpolation.insert(0, str(self.settings['visualization']['interpolation_factor']))
@@ -499,7 +443,6 @@ class SettingsTab(ttk.Frame):
             print(f"Connecting to {host} as {user}...")
             ssh.connect(host, username=user, password=password, timeout=15)
             
-<<<<<<< HEAD
             scp = SCPClient(ssh.get_transport())
 
             custom_path = self.ssh_printer_path.get().strip()
@@ -537,32 +480,12 @@ class SettingsTab(ttk.Frame):
                 raise last_error or FileNotFoundError("printer.cfg not found on the server.")
         except paramiko.AuthenticationException:
             messagebox.showerror(_("Error"), _("Authentication error. Check username and password."))
-=======
-            scp = SCPClient(ssh.get_transport())
-            
-            remote_path = "/opt/config/printer.cfg"
-            local_path = "config/printer.cfg"
-            os.makedirs("config", exist_ok=True)
-            print(f"Attempting to download {remote_path} to {local_path}...")
-            
-            scp.get(remote_path, local_path)
-            
-            scp.close()
-            ssh.close()
-
-            messagebox.showinfo(_("Success"), _("settings_tab.fill_printer_cfg").format(local_path))
-            self.main.load_config(filepath=local_path)
-
-        except paramiko.AuthenticationException:
-            messagebox.showerror(_("Error"), _("Authentication error. Check username and password."))
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         except paramiko.SSHException as e:
             messagebox.showerror(_("Error"), _("settings_tab.connection_error").format(str(e)))
         except FileNotFoundError:
             messagebox.showerror(_("Error"), _("File {remote_path} not found on the server."))
         except Exception as e:
             messagebox.showerror(_("Error"), _("settings_tab.connection_error").format(str(e)))
-<<<<<<< HEAD
         finally:
             try:
                 if 'scp' in locals():
@@ -571,16 +494,6 @@ class SettingsTab(ttk.Frame):
                     ssh.close()
             except:
                 pass
-=======
-        finally:
-            try:
-                if 'scp' in locals():
-                    scp.close()
-                if 'ssh' in locals():
-                    ssh.close()
-            except:
-                pass
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
     def get_shapers(self):
         host = self.ssh_host.get()

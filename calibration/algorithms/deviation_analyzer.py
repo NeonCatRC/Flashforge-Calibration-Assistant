@@ -31,21 +31,12 @@ class DeviationAnalyzer:
     def __init__(self, 
                 bed: Bed,
                 corner_averaging_size: int = 1,
-<<<<<<< HEAD
                 screw_threshold: float = 0.19,   # Порог для регулировки винтами
                 tape_threshold: float = 0.01,
                 screw_config: Optional[ScrewConfig] = None):   # Конфигурация винтов
 
         self.bed = bed
         self.corner_averaging_size = max(0, int(corner_averaging_size))
-=======
-                screw_threshold: float = 0.4,   # Порог для регулировки винтами
-                tape_threshold: float = 0.2,
-                screw_config: Optional[ScrewConfig] = None):   # Конфигурация винтов
-
-        self.bed = bed
-        self.corner_averaging_size = corner_averaging_size
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
         self.screw_threshold = screw_threshold
         self.tape_threshold = tape_threshold
         self.screw_config = screw_config or ScrewConfig()
@@ -62,13 +53,10 @@ class DeviationAnalyzer:
     def set_screw_config(self, screw_config: ScrewConfig) -> None:
         self.screw_config = screw_config
         self._build_screws()
-<<<<<<< HEAD
 
     def set_corner_averaging_size(self, area_size: int) -> None:
         """Update smoothing radius (in mesh points) used for corner measurements."""
         self.corner_averaging_size = max(0, int(area_size))
-=======
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 
     def get_stats(self) -> DeviationStats:
         """Получение статистики отклонений"""

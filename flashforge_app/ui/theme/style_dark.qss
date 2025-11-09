@@ -75,11 +75,7 @@ QPushButton:pressed {
 }
 
 QPushButton#PrimaryActionButton {
-<<<<<<< HEAD
     background-color: #F97316;
-=======
-    background-color: #FF6EA1;
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
     color: #0F111A;
     border: none;
     border-radius: 14px;
@@ -89,19 +85,11 @@ QPushButton#PrimaryActionButton {
 }
 
 QPushButton#PrimaryActionButton:hover {
-<<<<<<< HEAD
     background-color: #fb8a35;
 }
 
 QPushButton#PrimaryActionButton:pressed {
     background-color: #d85f0b;
-=======
-    background-color: #ff7fb0;
-}
-
-QPushButton#PrimaryActionButton:pressed {
-    background-color: #ff5c96;
->>>>>>> bbf854bab45be9c94d723c0854376a3124f889b7
 }
 
 QToolButton {
