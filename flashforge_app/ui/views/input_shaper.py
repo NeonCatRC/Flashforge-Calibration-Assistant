@@ -4,6 +4,7 @@ from pathlib import Path
 import html
 import sys
 from typing import Dict, List, Optional
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 
@@ -22,12 +23,13 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2].parent
-BASE_ANALYSIS = PROJECT_ROOT / "input_shaper" / "analysis"
-if str(BASE_ANALYSIS) not in sys.path:
-    sys.path.append(str(BASE_ANALYSIS))
-if str(BASE_ANALYSIS / "extras") not in sys.path:
-    sys.path.append(str(BASE_ANALYSIS / "extras"))
+from flashforge_app.runtime import bundle_dir
+
+_ANALYSIS = bundle_dir() / "input_shaper" / "analysis"
+if str(_ANALYSIS) not in sys.path:
+    sys.path.append(str(_ANALYSIS))
+if str(_ANALYSIS / "extras") not in sys.path:
+    sys.path.append(str(_ANALYSIS / "extras"))
 
 import calibrate_shaper  # type: ignore  # noqa: E402
 import shaper_calibrate  # type: ignore  # noqa: E402
@@ -57,9 +59,11 @@ class _AxisPlot(QFrame):
 
     def render(self, figure: Figure) -> None:
         if self.canvas:
+            old_fig = self.canvas.figure
             self.layout().removeWidget(self.canvas)
             self.canvas.setParent(None)
             self.canvas.deleteLater()
+            plt.close(old_fig)
         self.canvas = FigureCanvasQTAgg(figure)
         self.canvas.setStyleSheet("background: transparent;")
         self.canvas.setMinimumHeight(320)
@@ -68,9 +72,11 @@ class _AxisPlot(QFrame):
 
     def clear(self, placeholder: str) -> None:
         if self.canvas:
+            old_fig = self.canvas.figure
             self.layout().removeWidget(self.canvas)
             self.canvas.setParent(None)
             self.canvas.deleteLater()
+            plt.close(old_fig)
             self.canvas = None
         self.placeholder.setText(placeholder)
         self.placeholder.show()
@@ -118,29 +124,21 @@ class _AxisInfo(QFrame):
             self.on_select(self.axis_key, name.upper(), freq)
         return handler
 
-    def update_info(self, recommended_text: str, entries: list[dict]) -> None:
-        self.recommend_label.setText(recommended_text)
-        for label in self._line_labels:
-            self.lines_container.removeWidget(label)
-            label.deleteLater()
-        for button in self._buttons:
-            self.buttons_container.removeWidget(button)
-            button.deleteLater()
-        self._line_labels = []
-        self._buttons = []
-
+    def _clear_contents(self) -> None:
         while self.lines_container.count():
             item = self.lines_container.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
+            if item.widget():
+                item.widget().deleteLater()
         while self.buttons_container.count():
             item = self.buttons_container.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
-        self._line_labels = []
-        self._buttons = []
+            if item.widget():
+                item.widget().deleteLater()
+        self._line_labels.clear()
+        self._buttons.clear()
+
+    def update_info(self, recommended_text: str, entries: list[dict]) -> None:
+        self.recommend_label.setText(recommended_text)
+        self._clear_contents()
 
         for entry in entries:
             bullet = f"<span style='color:{entry['color']}; font-size:16px;'>●</span> "
@@ -176,18 +174,7 @@ class _AxisInfo(QFrame):
 
     def clear(self, placeholder: str) -> None:
         self.recommend_label.setText(placeholder)
-        while self.lines_container.count():
-            item = self.lines_container.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
-        while self.buttons_container.count():
-            item = self.buttons_container.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
-        self._line_labels = []
-        self._buttons = []
+        self._clear_contents()
 
 
 class InputShaperView(QWidget):
@@ -312,12 +299,6 @@ class InputShaperView(QWidget):
             self.summary_label.setText(tr("neo_ui.shaper.result_placeholder"))
             self.axis_info['x'].clear(tr("neo_ui.shaper.no_file"))
             self.axis_info['y'].clear(tr("neo_ui.shaper.no_file"))
-        theme = self.app_state.current_settings.theme
-        if theme == 'dark':
-            text_color = '#F7F9FF'
-        else:
-            text_color = '#1C1E24'
-        self.status_label.setStyleSheet(f"color: {text_color}")
         for axis in ('x', 'y'):
             entries = self._shaper_lists.get(axis)
             if entries:
@@ -409,6 +390,15 @@ class InputShaperView(QWidget):
         )
 
     # ------------------------------------------------------------------ data handling
+    def load_csv_files(self, files: list[Path]) -> None:
+        """Load multiple CSV files, ordering by axis (X first, then Y, then unknown)."""
+        ordered: list[Path] = []
+        for axis in ('x', 'y'):
+            ordered.extend(f for f in files if self._infer_axis_from_filename(f) == axis)
+        ordered.extend(f for f in files if f not in ordered)
+        for file in ordered:
+            self.load_csv_file(file, axis_hint=self._infer_axis_from_filename(file))
+
     def load_csv_file(self, path: Path, axis_hint: Optional[str] = None) -> bool:
         tr = self.localization.translate
         try:
@@ -497,11 +487,12 @@ class InputShaperView(QWidget):
             self.axis_plots[axis].placeholder.setText(placeholder)
 
     def _style_plot(self, fig: Figure) -> None:
-        is_dark = self.app_state.current_settings.theme == 'dark'
-        text_color = '#F7F9FF' if is_dark else '#1C1E24'
-        bg_color = '#1E1E1E' if is_dark else '#FFFFFF'
-        major_grid = '#666666' if is_dark else '#C0C0C0'
-        minor_grid = '#444444' if is_dark else '#E0E0E0'
+        from flashforge_app.ui.theme.palette import mpl_colors as _mpl_colors
+
+        mc = _mpl_colors(self.app_state.current_settings.theme)
+        text_color = mc["text"]
+        bg_color = mc["bg"]
+        edge_color = mc["edge"]
 
         fig.patch.set_facecolor(bg_color)
         for ax in fig.axes:
@@ -510,10 +501,10 @@ class InputShaperView(QWidget):
             ax.xaxis.label.set_color(text_color)
             ax.yaxis.label.set_color(text_color)
             for spine in ax.spines.values():
-                spine.set_color(text_color if is_dark else '#888888')
+                spine.set_color(edge_color)
             ax.title.set_color(text_color)
-            ax.grid(True, which='major', linestyle='--', color=major_grid, alpha=0.6)
-            ax.grid(True, which='minor', linestyle=':', color=minor_grid, alpha=0.4)
+            ax.grid(True, which='major', linestyle='--', color=edge_color, alpha=0.6)
+            ax.grid(True, which='minor', linestyle=':', color=edge_color, alpha=0.3)
             legend = ax.get_legend()
             if legend:
                 legend.get_frame().set_alpha(0.0)

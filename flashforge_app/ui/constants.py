@@ -1,0 +1,8 @@
+"""Named constants for the UI layer."""
+
+SIDEBAR_WIDTH = 220
+SPACING_SM, SPACING_MD, SPACING_LG = 8, 12, 16
+MARGIN_VIEW = (8, 8, 8, 8)
+MARGIN_CARD = (16, 14, 16, 14)
+FIG_DPI = 100
+ANIM_FADE_MS = 240

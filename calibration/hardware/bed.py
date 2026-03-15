@@ -111,8 +111,8 @@ class Bed:
         Returns:
             Tuple[float, float]: (мм на точку по X, мм на точку по Y)
         """
-        x_step = self.config.size_x / (self.config.mesh_points_x - 1)
-        y_step = self.config.size_y / (self.config.mesh_points_y - 1)
+        x_step = self.config.size_x / max(self.config.mesh_points_x - 1, 1)
+        y_step = self.config.size_y / max(self.config.mesh_points_y - 1, 1)
         return x_step, y_step
     
     def generate_ideal_plane(self) -> np.ndarray:

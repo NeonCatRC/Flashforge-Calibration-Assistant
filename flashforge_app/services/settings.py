@@ -6,7 +6,9 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 
-SETTINGS_PATH = Path("config") / "app_settings.json"
+from flashforge_app.runtime import app_dir
+
+SETTINGS_PATH = app_dir() / "config" / "app_settings.json"
 
 
 @dataclass

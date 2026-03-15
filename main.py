@@ -24,9 +24,6 @@ REQUIRED_PACKAGES = {
     "PySide6": "PySide6",
 }
 
-REQUIRED_DIRECTORIES = ("config", "languages")
-
-
 def check_dependencies() -> bool:
     missing = [pkg for module, pkg in REQUIRED_PACKAGES.items() if find_spec(module) is None]
     if missing:
@@ -39,8 +36,8 @@ def check_dependencies() -> bool:
 
 
 def prepare_directories() -> None:
-    for directory in REQUIRED_DIRECTORIES:
-        Path(directory).mkdir(parents=True, exist_ok=True)
+    from flashforge_app.runtime import app_dir
+    (app_dir() / "config").mkdir(parents=True, exist_ok=True)
 
 
 def configure_logging() -> None:

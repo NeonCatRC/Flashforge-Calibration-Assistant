@@ -28,7 +28,10 @@ class LocalizationService:
     convenient access to text resources across the UI.
     """
 
-    def __init__(self, languages_dir: Path | str = Path("languages"), default_language: str = "en") -> None:
+    def __init__(self, languages_dir: Path | str | None = None, default_language: str = "en") -> None:
+        if languages_dir is None:
+            from flashforge_app.runtime import bundle_dir
+            languages_dir = bundle_dir() / "languages"
         self._languages_dir = Path(languages_dir)
         self._default_language = default_language
         self._languages: Dict[str, LanguageDefinition] = {}

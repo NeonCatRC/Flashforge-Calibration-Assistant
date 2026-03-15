@@ -16,6 +16,10 @@ config/app_settings.json
 config/printer.cfg
 config/settings.json
 
+# Build
+build/
+dist/
+
 # IDE
 .idea/
 .vscode/

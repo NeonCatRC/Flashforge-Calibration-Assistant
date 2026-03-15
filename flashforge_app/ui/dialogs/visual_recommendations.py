@@ -12,6 +12,7 @@ from __future__ import annotations
 import html
 from typing import Iterable, Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
@@ -310,59 +311,38 @@ class VisualRecommendationsDialog(QDialog):
         else:
             self.metric_widgets["improvement"].setText("—")
 
+    def _format_thermal_lines(self, stage: StageResult) -> list[str]:
+        """Thermal-model info lines shared between stage meta and hints."""
+        tr = self.localization.translate
+        model = self._active_thermal_model()
+        info = stage.metadata or {}
+        return [
+            tr("temperature_preset_line", "Preset: {name} ({measurement:.0f}°C → {target:.0f}°C)").format(
+                name=model["name"], measurement=model["measurement_temp"], target=model["target_temp"],
+            ),
+            tr("temperature_profile_line", "PEI {pei:.2f} mm • Steel {steel:.2f} mm • γ={gamma:.2f} • β={beta:.2f}").format(
+                pei=model["pei_thickness"], steel=model["steel_thickness"],
+                gamma=model["chamber_factor"], beta=model["beta_uniform"],
+            ),
+            tr("temperature_coeff_line", "α_PE={alpha_pe:.2e} • α steel={alpha_steel:.2e}").format(
+                alpha_pe=model["alpha_pei"], alpha_steel=model["alpha_steel"],
+            ),
+            tr("temperature_delta_line", "Surface ΔT={delta_through:.1f}°C • Chamber ΔT={delta_uniform:.1f}°C").format(
+                delta_through=info.get("delta_through", 0.0), delta_uniform=info.get("delta_uniform", 0.0),
+            ),
+            tr("temperature_curvature_line", "Curvature ≈ {kappa:.3e} 1/mm • Warp ±{warp:.3f} mm (range {warp_range:.3f} mm)").format(
+                kappa=info.get("kappa_total", 0.0),
+                warp=max(abs(info.get("warp_max", 0.0)), abs(info.get("warp_min", 0.0))),
+                warp_range=info.get("warp_range", 0.0),
+            ),
+        ]
+
     def _update_stage_meta(self, stage: StageResult) -> None:
         if stage.key != "after_temperature":
             self.stage_meta_label.hide()
             self.stage_meta_label.clear()
             return
-
-        tr = self.localization.translate
-        model = self._active_thermal_model()
-        info = stage.metadata or {}
-        name = model.get("name") or tr("temperature_preset_custom", "Custom preset")
-        measurement = model.get("measurement_temp", self.settings.environment.measurement_temp)
-        target = model.get("target_temp", self.settings.environment.target_temp)
-        gamma = model.get("chamber_factor", 0.0)
-        beta_uniform = model.get("beta_uniform", 0.0)
-        pei = model.get("pei_thickness", 0.0)
-        steel = model.get("steel_thickness", 0.0)
-        alpha_pe = model.get("alpha_pei", 0.0)
-        alpha_steel = model.get("alpha_steel", 0.0)
-
-        delta_through = info.get("delta_through", 0.0)
-        delta_uniform = info.get("delta_uniform", 0.0)
-        kappa_total = info.get("kappa_total", 0.0)
-        warp_range = info.get("warp_range", 0.0)
-        warp_half = max(abs(info.get("warp_max", 0.0)), abs(info.get("warp_min", 0.0)))
-
-        preset_tpl = tr(
-            "temperature_preset_line",
-            "Preset: {name} ({measurement:.0f}°C → {target:.0f}°C)",
-        )
-        profile_tpl = tr(
-            "temperature_profile_line",
-            "PEI {pei:.2f} mm • Steel {steel:.2f} mm • γ={gamma:.2f} • β={beta:.2f}",
-        )
-        coeff_tpl = tr(
-            "temperature_coeff_line",
-            "α_PE={alpha_pe:.2e} • α steel={alpha_steel:.2e}",
-        )
-        delta_tpl = tr(
-            "temperature_delta_line",
-            "Surface ΔT={delta_through:.1f}°C • Chamber ΔT={delta_uniform:.1f}°C",
-        )
-        curvature_tpl = tr(
-            "temperature_curvature_line",
-            "Curvature ≈ {kappa:.3e} 1/mm • Warp ±{warp:.3f} mm (range {warp_range:.3f} mm)",
-        )
-
-        lines = [
-            preset_tpl.format(name=name, measurement=measurement, target=target),
-            profile_tpl.format(pei=pei, steel=steel, gamma=gamma, beta=beta_uniform),
-            coeff_tpl.format(alpha_pe=alpha_pe, alpha_steel=alpha_steel),
-            delta_tpl.format(delta_through=delta_through, delta_uniform=delta_uniform),
-            curvature_tpl.format(kappa=kappa_total, warp=warp_half, warp_range=warp_range),
-        ]
+        lines = self._format_thermal_lines(stage)
         self.stage_meta_label.setText("<br>".join(html.escape(line) for line in lines))
         self.stage_meta_label.show()
 
@@ -459,58 +439,60 @@ class VisualRecommendationsDialog(QDialog):
             QTimer.singleShot(100, lambda: self._start_animation(animator))
 
     def _start_animation(self, animator: animation.FuncAnimation) -> None:
-        """Запускает анимацию после того как canvas отрисован."""
+        """Drive the matplotlib animation via a QTimer for reliable Qt repaints."""
         if not animator or not self.figure_canvas:
             return
         try:
-            original_update = animator._func  # type: ignore[attr-defined]
-            canvas = self.figure_canvas
+            # Stop the native matplotlib timer
+            interval = 120
+            source = getattr(animator, "event_source", None)
+            if source is not None:
+                try:
+                    interval = int(source.interval)
+                    source.stop()
+                except Exception:
+                    pass
 
-            # Выполняем первый кадр до старта, чтобы клин стал видимым
-            try:
-                original_update(1)
-            except Exception:
-                pass
-
-            def patched_update(frame):
-                result = original_update(frame)
-                canvas.draw_idle()
-                return result
-
-            animator._func = patched_update  # type: ignore[attr-defined]
             self.figure_canvas.draw()
 
-            # Переводим управление таймером в Qt, чтобы гарантировать обновление
             if self._qt_anim_timer:
                 self._qt_anim_timer.stop()
                 self._qt_anim_timer.deleteLater()
-            interval = 120
-            native_timer = getattr(animator, "event_source", None)
-            if native_timer is not None:
-                try:
-                    interval = int(native_timer.interval)
-                    native_timer.stop()
-                except Exception:
-                    pass
+
+            canvas = self.figure_canvas
             self._qt_anim_timer = QTimer(self)
             self._qt_anim_timer.setInterval(max(30, interval))
 
-            def step_animation() -> None:
+            def step() -> None:
                 try:
                     animator._step()  # type: ignore[attr-defined]
+                    canvas.draw_idle()
                 except Exception:
                     pass
 
-            self._qt_anim_timer.timeout.connect(step_animation)
+            self._qt_anim_timer.timeout.connect(step)
             self._qt_anim_timer.start()
-            step_animation()
+            step()
         except (AttributeError, RuntimeError):
             pass
 
-    def _build_screw_figure(self, stage: StageResult) -> tuple[Optional[Figure], Optional[animation.FuncAnimation]]:
-        """Построение анимированной фигуры винтов (как в референсе)."""
-        adjustments: dict[str, tuple[float, RotationDirection]] = {}
+    def _make_visualizer(self) -> ScrewAdjustmentVisualizer:
+        return ScrewAdjustmentVisualizer(
+            translator=self.localization.translate,
+            is_dark_theme=self.theme == "dark",
+            show_minutes=self.show_minutes,
+            show_degrees=self.show_degrees,
+            screw_mode=self.settings.hardware.screw_mode,
+        )
 
+    @staticmethod
+    def _finalize_fig(fig: Figure) -> tuple[Figure, Optional[animation.FuncAnimation]]:
+        fig.set_size_inches(11, 8)
+        fig.set_dpi(100)
+        return fig, getattr(fig, "animation", None)
+
+    def _build_screw_figure(self, stage: StageResult) -> tuple[Optional[Figure], Optional[animation.FuncAnimation]]:
+        adjustments: dict[str, tuple[float, RotationDirection]] = {}
         for action in stage.actions:
             minutes = action.minutes
             if minutes is None and action.degrees is not None:
@@ -519,38 +501,19 @@ class VisualRecommendationsDialog(QDialog):
                 minutes = float(action.metadata["turns"]) * 60.0
             if minutes is None:
                 continue
-
             direction = RotationDirection.COUNTERCLOCKWISE
             if action.direction:
-                dir_lower = action.direction.lower()
-                if dir_lower in {"clockwise", "down", "cw"}:
+                d = action.direction.lower()
+                if d in {"clockwise", "down", "cw"}:
                     direction = RotationDirection.CLOCKWISE
-                elif dir_lower in {"counterclockwise", "up", "ccw"}:
-                    direction = RotationDirection.COUNTERCLOCKWISE
-
             adjustments[action.identifier] = (abs(float(minutes)), direction)
-
         if not adjustments:
             return None, None
-
-        visualizer = ScrewAdjustmentVisualizer(
-            translator=self.localization.translate,
-            is_dark_theme=self.theme == "dark",
-            show_minutes=self.show_minutes,
-            show_degrees=self.show_degrees,
-            screw_mode=self.settings.hardware.screw_mode,
-        )
-
-        fig = visualizer.create_adjustment_figure(adjustments)
-        fig.set_size_inches(11, 8)
-        fig.set_dpi(100)
-        animator = getattr(fig, "animation", None)
-        return fig, animator
+        fig = self._make_visualizer().create_adjustment_figure(adjustments)
+        return self._finalize_fig(fig)
 
     def _build_belt_figure(self, stage: StageResult) -> tuple[Optional[Figure], Optional[animation.FuncAnimation]]:
-        """Построение фигуры синхронизации валов."""
         adjustments: dict[str, dict[str, object]] = {}
-
         for action in stage.actions:
             if action.kind != "belt":
                 continue
@@ -564,23 +527,10 @@ class VisualRecommendationsDialog(QDialog):
                 "direction": action.direction or "",
                 "delta_mm": float(action.magnitude_mm or 0.0),
             }
-
         if not adjustments:
             return None, None
-
-        visualizer = ScrewAdjustmentVisualizer(
-            translator=self.localization.translate,
-            is_dark_theme=self.theme == "dark",
-            show_minutes=self.show_minutes,
-            show_degrees=self.show_degrees,
-            screw_mode=self.settings.hardware.screw_mode,
-        )
-
-        fig = visualizer.create_belt_animation_figure(adjustments)
-        fig.set_size_inches(11, 8)
-        fig.set_dpi(100)
-        animator = getattr(fig, "animation", None)
-        return fig, animator
+        fig = self._make_visualizer().create_belt_animation_figure(adjustments)
+        return self._finalize_fig(fig)
 
     def _build_tape_figure(self, stage: StageResult) -> Optional[Figure]:
         if stage.mesh is None:
@@ -632,7 +582,9 @@ class VisualRecommendationsDialog(QDialog):
         fig.patch.set_alpha(0.0)
         ax = fig.add_subplot(111)
         ax.set_facecolor("none")
-        text_color = "#F8FAFC" if self.theme == "dark" else "#1E293B"
+        from flashforge_app.ui.theme.palette import mpl_colors as _mpl_colors
+        mc = _mpl_colors(self.theme)
+        text_color = mc["text"]
 
         is_temperature = stage.key == "after_temperature"
         info = stage.metadata or {}
@@ -775,8 +727,10 @@ class VisualRecommendationsDialog(QDialog):
     def _clear_figure(self) -> None:
         self._stop_animation()
         if self.figure_canvas:
+            fig = self.figure_canvas.figure
             self.figure_canvas.setParent(None)
             self.figure_canvas.deleteLater()
+            plt.close(fig)
             self.figure_canvas = None
         self.figure_placeholder.show()
 
@@ -839,33 +793,7 @@ class VisualRecommendationsDialog(QDialog):
             hints.append(tr("neo_ui.visual.hints.tape.step_3"))
             hints.append(tr("neo_ui.visual.hints.tape.step_4"))
         elif key == "after_temperature":
-            model = self._active_thermal_model()
-            info = stage.metadata or {}
-            name = model.get("name") or tr("temperature_preset_custom")
-            hints.append(tr(
-                "temperature_preset_line",
-                "Preset: {name} ({measurement:.0f}°C → {target:.0f}°C)",
-            ).format(name=name, measurement=model["measurement_temp"], target=model["target_temp"]))
-            hints.append(tr(
-                "temperature_profile_line",
-                "PEI {pei:.2f} mm • Steel {steel:.2f} mm • γ={gamma:.2f} • β={beta:.2f}",
-            ).format(pei=model["pei_thickness"], steel=model["steel_thickness"], gamma=model["chamber_factor"], beta=model["beta_uniform"]))
-            hints.append(tr(
-                "temperature_coeff_line",
-                "α_PE={alpha_pe:.2e} • α_steel={alpha_steel:.2e}",
-            ).format(alpha_pe=model["alpha_pei"], alpha_steel=model["alpha_steel"]))
-            hints.append(tr(
-                "temperature_delta_line",
-                "Surface ΔT={delta_through:.1f}°C • Chamber ΔT={delta_uniform:.1f}°C",
-            ).format(delta_through=info.get("delta_through", 0.0), delta_uniform=info.get("delta_uniform", 0.0)))
-            hints.append(tr(
-                "temperature_curvature_line",
-                "Curvature ≈ {kappa:.3e} 1/mm • Warp ±{warp:.3f} mm (range {warp_range:.3f} mm)",
-            ).format(
-                kappa=info.get("kappa_total", 0.0),
-                warp=max(abs(info.get("warp_max", 0.0)), abs(info.get("warp_min", 0.0))),
-                warp_range=info.get("warp_range", 0.0),
-            ))
+            hints.extend(self._format_thermal_lines(stage))
             hints.append(tr("neo_ui.visual.hints.temperature.tip"))
         elif stage.description:
             hints.append(tr(stage.description))

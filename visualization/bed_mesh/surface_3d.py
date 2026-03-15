@@ -7,18 +7,18 @@
 from typing import Callable, Optional
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib import patheffects
+from matplotlib.artist import setp as _mpl_setp
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from mpl_toolkits.mplot3d import Axes3D
-import tkinter as tk
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 – registers 3d projection
 
 from data_processing.mesh_interpolator import MeshInterpolator
-from visualization.widgets.custom_toolbars import MinimalNavigationToolbar
-from app.ui.language import _
 
 Translator = Callable[[str, Optional[str]], str]
+
+
+def _noop_translator(key: str, default: Optional[str] = None) -> str:
+    return default if default is not None else key
 
 
 class BedMesh3D:
@@ -34,15 +34,17 @@ class BedMesh3D:
         self.mesh_data = None
         self.max_delta = None
         self.is_dark_theme = is_dark_theme
-        self.interpolation_factor = 100  # Количество точек сетки после интерполяции
+        self.interpolation_factor = 50  # Количество точек сетки после интерполяции
         self.figsize = (7.0, 5.5)
-        self._translator: Translator = translator or _
+        self._translator: Translator = translator or _noop_translator
+        self._interp_cache: Optional[tuple] = None  # (mesh_hash, factor, X, Y, Z)
+        self._cache_key: Optional[tuple] = None
 
     # ------------------------------------------------------------------ service helpers
     def set_translator(self, translator: Optional[Translator]) -> None:
         """Устанавливает функцию перевода, совместимую с LocalizationService."""
         if translator is None:
-            self._translator = _
+            self._translator = _noop_translator
         else:
             self._translator = translator
 
@@ -58,32 +60,8 @@ class BedMesh3D:
         """
         self.mesh_data = mesh_data
         self.max_delta = float(np.max(self.mesh_data) - np.min(self.mesh_data))
-
-
-    def display_in_frame(self, frame):
-        """
-        Отображение 3D карты в заданном фрейме
-        
-        Args:
-            frame: Фрейм tkinter для отображения
-        """
-        if self.mesh_data is None:
-            return
-            
-        # Удаляем предыдущие виджеты
-        for widget in frame.winfo_children():
-            widget.destroy()
-            
-        fig = self.create_3d_figure()
-        
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.draw()
-        
-        # Создаем минимальную панель инструментов (без кнопок)
-        toolbar = MinimalNavigationToolbar(canvas, frame)
-        toolbar.update()
-        
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        self._interp_cache = None
+        self._cache_key = None
 
 
     def set_theme(self, is_dark_theme: bool) -> None:
@@ -132,17 +110,19 @@ class BedMesh3D:
         
         # Получаем размеры сетки
         rows, cols = self.mesh_data.shape
-        
-        # Создаем интерполятор
-        interpolator = MeshInterpolator(self.mesh_data, rows, cols)
-        
-        # Выполняем интерполяцию
-        X_smooth, Y_smooth, Z_smooth = interpolator.interpolate_cubic(
-            target_points=self.interpolation_factor
-        )
-        
-        # Применяем сглаживание для более естественного отображения
-        Z_smooth = interpolator.apply_smoothing(Z_smooth, alpha=0.1)
+
+        # Используем кеш интерполяции если данные не изменились
+        cache_key = (self.mesh_data.data.tobytes(), self.interpolation_factor)
+        if self._cache_key == cache_key and self._interp_cache is not None:
+            X_smooth, Y_smooth, Z_smooth = self._interp_cache
+        else:
+            interpolator = MeshInterpolator(self.mesh_data, rows, cols)
+            X_smooth, Y_smooth, Z_smooth = interpolator.interpolate_cubic(
+                target_points=self.interpolation_factor
+            )
+            Z_smooth = interpolator.apply_smoothing(Z_smooth, alpha=0.1)
+            self._interp_cache = (X_smooth, Y_smooth, Z_smooth)
+            self._cache_key = cache_key
         
         # Выбираем цветовую карту с учетом темы
         cmap = 'viridis' if self.is_dark_theme else 'coolwarm_r'
@@ -155,7 +135,7 @@ class BedMesh3D:
         cbar = fig.colorbar(surf, ax=ax, fraction=0.04, pad=0.03)
         cbar.set_label(self._tr("visualization.height_mm"), color=text_color)
         cbar.ax.yaxis.set_tick_params(color=text_color)
-        plt.setp(cbar.ax.get_yticklabels(), color=text_color)
+        _mpl_setp(cbar.ax.get_yticklabels(), color=text_color)
         
         # Настраиваем цвета для темной темы
         if self.is_dark_theme:
@@ -227,62 +207,10 @@ class BedMesh3D:
         # Подписи осей
         ax.set_xlabel('X', color=text_color)
         ax.set_ylabel('Y', color=text_color)
-        ax.set_zlabel(_("visualization.height_mm"), color=text_color)
-        
-        return fig
-        
-    def display_in_window(self, parent_widget):
-        """
-        Отображение 3D карты в отдельном окне tkinter
-        
-        Args:
-            parent_widget: Родительский виджет tkinter
-        """
-        if self.mesh_data is None:
-            return
-            
-        top = tk.Toplevel(parent_widget)
-        top.title(_("visualization.3d_map_window_title"))
-        top.geometry("800x700")
-        
-        fig = self.create_3d_figure()
-        
-        canvas = FigureCanvasTkAgg(fig, master=top)
-        canvas.draw()
-        
-        class CustomNavigationToolbar(NavigationToolbar2Tk):
-            def __init__(self, canvas, window):
-                self.toolitems = []  # Пустой список - нет кнопок
-                NavigationToolbar2Tk.__init__(self, canvas, window)
+        ax.set_zlabel(self._tr("visualization.height_mm"), color=text_color)
 
-        custom_toolbar = CustomNavigationToolbar(canvas, frame)
-        
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        
-    def display_in_frame(self, frame):
-        """
-        Отображение 3D карты в заданном фрейме
-        
-        Args:
-            frame: Фрейм tkinter для отображения
-        """
-        if self.mesh_data is None:
-            return
-            
-        # Удаляем предыдущие виджеты
-        for widget in frame.winfo_children():
-            widget.destroy()
-            
-        fig = self.create_3d_figure()
-        
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.draw()
-        
-        toolbar = NavigationToolbar2Tk(canvas, frame)
-        toolbar.update()
-        
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        
+        return fig
+
     def create_comparison_figure(self, before_mesh: np.ndarray, after_mesh: np.ndarray) -> Figure:
         """
         Создание фигуры с сравнением двух поверхностей (до и после регулировки)
@@ -340,14 +268,14 @@ class BedMesh3D:
         # Добавляем цветовые шкалы
         cbar1 = fig.colorbar(surf_before, ax=ax, shrink=0.4, pad=0.05, aspect=10)
         cbar2 = fig.colorbar(surf_after, ax=ax, shrink=0.4, pad=0.15, aspect=10)
-        cbar1.set_label(_("visualization.before_mm"), color=text_color)
-        cbar2.set_label(_("visualization.after_mm"), color=text_color)
+        cbar1.set_label(self._tr("visualization.before_mm"), color=text_color)
+        cbar2.set_label(self._tr("visualization.after_mm"), color=text_color)
         
         # Настраиваем цвета для темной темы
         if self.is_dark_theme:
             for cbar in [cbar1, cbar2]:
                 cbar.ax.yaxis.set_tick_params(color=text_color)
-                plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color=text_color)
+                _mpl_setp(cbar.ax.get_yticklabels(), color=text_color)
             
             ax.xaxis.set_tick_params(colors=text_color)
             ax.yaxis.set_tick_params(colors=text_color)
@@ -359,7 +287,7 @@ class BedMesh3D:
         improvement = before_deviation - after_deviation
         percent_improvement = (improvement / before_deviation) * 100 if before_deviation > 0 else 0
         
-        title = _("visual_rec.improvement_prediction").format(
+        title = self._tr("visual_rec.improvement_prediction").format(
             improvement=improvement,
             percent=percent_improvement,
             before=before_deviation,
@@ -374,12 +302,12 @@ class BedMesh3D:
         # Подписи осей
         ax.set_xlabel('X', color=text_color)
         ax.set_ylabel('Y', color=text_color)
-        ax.set_zlabel(_("visualization.height_mm"), color=text_color)
-        
+        ax.set_zlabel(self._tr("visualization.height_mm"), color=text_color)
+
         # Добавляем легенду (создаем proxy для поверхностей)
         import matplotlib.patches as mpatches
-        before_patch = mpatches.Patch(color='blue', label=_("visual_rec.before_adjustment"))
-        after_patch = mpatches.Patch(color='green', label=_("visual_rec.after_adjustment"))
+        before_patch = mpatches.Patch(color='blue', label=self._tr("visual_rec.before_adjustment"))
+        after_patch = mpatches.Patch(color='green', label=self._tr("visual_rec.after_adjustment"))
         ax.legend(handles=[before_patch, after_patch], loc='upper right')
         
         fig.tight_layout()

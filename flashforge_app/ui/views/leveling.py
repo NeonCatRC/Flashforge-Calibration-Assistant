@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (
     QGridLayout,
     QFileDialog,
@@ -53,6 +54,10 @@ class BedLevelingView(QWidget):
         self._fig_pixel_height = int(self._fig_height_inches * 100)
         self._last_render_size: tuple[int, int] = (0, 0)
         self._render_lock = False
+        self._resize_timer = QTimer(self)
+        self._resize_timer.setSingleShot(True)
+        self._resize_timer.setInterval(200)
+        self._resize_timer.timeout.connect(self._render_visualizations)
 
         self._build_ui()
         self.apply_translations()
@@ -329,8 +334,10 @@ class BedLevelingView(QWidget):
     def _remove_canvas(self) -> None:
         for canvas in (self.heatmap_canvas, self.surface_canvas):
             if canvas:
+                fig = canvas.figure
                 canvas.setParent(None)
                 canvas.deleteLater()
+                plt.close(fig)
         self.heatmap_placeholder.show()
         self.surface_placeholder.show()
         self.heatmap_canvas = None
@@ -424,7 +431,7 @@ class BedLevelingView(QWidget):
         last_w, last_h = self._last_render_size
         if abs(width - last_w) < 40 and abs(height - last_h) < 40:
             return
-        self._render_visualizations()
+        self._resize_timer.start()
 
     def _update_fig_dimensions(self) -> None:
         dpi = 100

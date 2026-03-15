@@ -7,6 +7,7 @@
 import paramiko
 import os
 import logging
+import shlex
 from typing import Tuple, Optional, Dict, List
 
 
@@ -99,9 +100,11 @@ class SSHConnectionManager:
         try:
             from scp import SCPClient
             scp = SCPClient(self.client.get_transport())
-            scp.get(remote_path, local_path)
-            scp.close()
-            return True
+            try:
+                scp.get(remote_path, local_path)
+                return True
+            finally:
+                scp.close()
         except Exception as e:
             logging.error(f"File download error: {str(e)}")
             return False
@@ -117,7 +120,7 @@ class SSHConnectionManager:
         Returns:
             List[str]: Список полных путей к найденным файлам
         """
-        command = f"find {remote_dir} -name '{pattern}' -type f"
+        command = f"find {shlex.quote(remote_dir)} -name {shlex.quote(pattern)} -type f"
         exit_code, stdout, _ = self.execute_command(command)
         
         if exit_code == 0:

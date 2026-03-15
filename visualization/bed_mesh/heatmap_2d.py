@@ -7,39 +7,32 @@
 from typing import Callable, Optional
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib import patheffects
+from matplotlib.artist import setp as _mpl_setp
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-import tkinter as tk
-
-from visualization.widgets.custom_toolbars import MinimalNavigationToolbar
-from app.ui.language import _
 
 Translator = Callable[[str, Optional[str]], str]
+
+
+def _noop_translator(key: str, default: Optional[str] = None) -> str:
+    return default if default is not None else key
 
 
 class BedMeshHeatmap:
     """Класс для отображения 2D тепловой карты стола."""
 
     def __init__(self, is_dark_theme: bool = False, translator: Optional[Translator] = None):
-        """
-        Инициализация визуализатора
-        
-        Args:
-            is_dark_theme: Использовать ли темную тему
-        """
         self.mesh_data = None
         self.max_delta = None
         self.is_dark_theme = is_dark_theme
         self.figsize = (6.5, 5.0)
-        self._translator: Translator = translator or _
+        self._translator: Translator = translator or _noop_translator
 
     # ------------------------------------------------------------------ service helpers
     def set_translator(self, translator: Optional[Translator]) -> None:
         """Устанавливает функцию перевода, совместимую с LocalizationService."""
         if translator is None:
-            self._translator = _
+            self._translator = _noop_translator
         else:
             self._translator = translator
 
@@ -70,31 +63,6 @@ class BedMeshHeatmap:
         if width > 0 and height > 0:
             self.figsize = (width, height)
 
-    def display_in_frame(self, frame):
-        """
-        Отображение тепловой карты в заданном фрейме
-        
-        Args:
-            frame: Фрейм tkinter для отображения
-        """
-        if self.mesh_data is None:
-            return
-            
-        # Удаляем предыдущие виджеты
-        for widget in frame.winfo_children():
-            widget.destroy()
-            
-        fig = self.create_2d_figure()
-        
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.draw()
-        
-        # Создаем минимальную панель инструментов (без кнопок)
-        toolbar = MinimalNavigationToolbar(canvas, frame)
-        toolbar.update()
-        
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
     def create_2d_figure(self) -> Figure:
         """Создание фигуры с 2D тепловой картой."""
         if self.mesh_data is None:
@@ -116,7 +84,7 @@ class BedMeshHeatmap:
         cbar = fig.colorbar(im, ax=ax, fraction=0.035, pad=0.04)
         cbar.set_label(self._tr("visualization.height_mm"), color=text_color)
         cbar.ax.yaxis.set_tick_params(color=text_color)
-        plt.setp(cbar.ax.get_yticklabels(), color=text_color)
+        _mpl_setp(cbar.ax.get_yticklabels(), color=text_color)
 
         for i in range(rows):
             for j in range(cols):
@@ -191,54 +159,3 @@ class BedMeshHeatmap:
 
         return fig
 
-    def display_in_window(self, parent_widget):
-        """
-        Отображение тепловой карты в отдельном окне tkinter
-        
-        Args:
-            parent_widget: Родительский виджет tkinter
-        """
-        if self.mesh_data is None:
-            return
-            
-        top = tk.Toplevel(parent_widget)
-        top.title(self._tr("visualization.2d_map_title"))
-        top.geometry("800x700")
-        
-        fig = self.create_2d_figure()
-        
-        canvas = FigureCanvasTkAgg(fig, master=top)
-        canvas.draw()
-        
-        toolbar = NavigationToolbar2Tk(canvas, top)
-        toolbar.update()
-        
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        
-    def display_in_frame(self, frame):
-        """
-        Отображение тепловой карты в заданном фрейме
-        
-        Args:
-            frame: Фрейм tkinter для отображения
-        """
-        if self.mesh_data is None:
-            return
-            
-        # Удаляем предыдущие виджеты
-        for widget in frame.winfo_children():
-            widget.destroy()
-            
-        fig = self.create_2d_figure()
-        
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.draw()
-        
-        class CustomNavigationToolbar(NavigationToolbar2Tk):
-            def __init__(self, canvas, window):
-                self.toolitems = []  # Пустой список - нет кнопок
-                NavigationToolbar2Tk.__init__(self, canvas, window)
-
-        custom_toolbar = CustomNavigationToolbar(canvas, frame)
-        
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)

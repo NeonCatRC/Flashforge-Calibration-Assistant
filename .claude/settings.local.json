@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''flashforge_app/ui/widgets/animated_stack.py'', doraise=True\\); print\\(''OK''\\)\")",
+      "Bash(wc -l /c/Users/NeonCatRC/Documents/Flashforge-Calibration-Assistant/input_shaper/analysis/extras/*.py)",
+      "Bash(grep -n \"coolwarm\\\\|viridis\\\\|cmap\" /c/Users/NeonCatRC/Documents/Flashforge-Calibration-Assistant/visualization/bed_mesh/*.py)",
+      "Bash(grep -n \"figsize\\\\|dpi\\\\|Figure\\(\" /c/Users/NeonCatRC/Documents/Flashforge-Calibration-Assistant/visualization/bed_mesh/*.py)",
+      "Bash(grep -n \"close\\\\|clear\\\\|destroy\\\\|gc\\\\|cleanup\" /c/Users/NeonCatRC/Documents/Flashforge-Calibration-Assistant/visualization/bed_mesh/*.py /c/Users/NeonCatRC/Documents/Flashforge-Calibration-Assistant/flashforge_app/ui/views/leveling.py)",
+      "Bash(grep -n \"display_in_window\\\\|display_in_frame\" /c/Users/NeonCatRC/Documents/Flashforge-Calibration-Assistant/visualization/bed_mesh/*.py)",
+      "Bash(tree -L 3 -d --ignore \".git|.claude\")",
+      "Bash(ls -la *.py *.txt *.md *.json *.spec)",
+      "Read(//c/Users/NeonCatRC/Documents/Flashforge-Calibration-Assistant/**)"
+    ]
+  }
+}

@@ -430,7 +430,4 @@ class SettingsView(QWidget):
         env = self.settings.environment
         env.measurement_temp = preset.measurement_temp
         env.target_temp = preset.target_temp
-        if 'measurement_temp' in self.environment_fields:
-            self.environment_fields['measurement_temp'].setText(str(preset.measurement_temp))
-        if 'target_temp' in self.environment_fields:
-            self.environment_fields['target_temp'].setText(str(preset.target_temp))
+        self._populate_environment_from_preset(preset)

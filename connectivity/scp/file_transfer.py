@@ -7,6 +7,7 @@
 import paramiko
 import os
 import logging
+import shlex
 from typing import List, Dict, Optional
 from scp import SCPClient
 
@@ -157,7 +158,8 @@ class SCPFileTransfer:
         
         try:
             # Получаем список файлов в удаленной директории
-            command = f"find {remote_dir} -type f" if recursive else f"find {remote_dir} -maxdepth 1 -type f"
+            safe_dir = shlex.quote(remote_dir)
+            command = f"find {safe_dir} -type f" if recursive else f"find {safe_dir} -maxdepth 1 -type f"
             stdin, stdout, stderr = self.ssh_client.exec_command(command)
             
             remote_files = [line.strip() for line in stdout.readlines() if line.strip()]
@@ -206,7 +208,7 @@ class SCPFileTransfer:
                 os.makedirs(local_dir, exist_ok=True)
                 
             # Ищем файлы по шаблону
-            command = f"find {remote_dir} -name '{pattern}' -type f"
+            command = f"find {shlex.quote(remote_dir)} -name {shlex.quote(pattern)} -type f"
             stdin, stdout, stderr = self.ssh_client.exec_command(command)
             
             remote_files = [line.strip() for line in stdout.readlines() if line.strip()]

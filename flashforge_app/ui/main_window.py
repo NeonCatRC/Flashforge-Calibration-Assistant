@@ -314,14 +314,7 @@ class MainWindow(QMainWindow):
             self.bed_view.set_workspace(self.app_state.workspace)
 
     def _on_shaper_files_downloaded(self, files: list[Path]) -> None:
-        ordered: list[Path] = []
-        for axis in ('x', 'y'):
-            ordered.extend([f for f in files if self.shaper_view._infer_axis_from_filename(f) == axis])
-        ordered.extend([f for f in files if f not in ordered])
-
-        for file in ordered:
-            axis_hint = self.shaper_view._infer_axis_from_filename(file)
-            self.shaper_view.load_csv_file(file, axis_hint=axis_hint)
+        self.shaper_view.load_csv_files(files)
 
     # ------------------------------------------------------------------ drag and drop support
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
@@ -355,7 +348,3 @@ class MainWindow(QMainWindow):
                 self.localization.translate("neo_ui.dialogs.drop_unsupported"),
             )
         event.acceptProposedAction()
-
-    QDragEnterEvent,
-    QDropEvent,
-    QMessageBox,

@@ -102,7 +102,10 @@ class MeshInterpolator:
         """
         # Нормализуем данные для сглаживания
         z_min, z_max = np.nanmin(z_data), np.nanmax(z_data)
-        normalized_data = (z_data - z_min) / (z_max - z_min)
+        z_range = z_max - z_min
+        if z_range == 0:
+            return z_data.copy()
+        normalized_data = (z_data - z_min) / z_range
         
         # Применяем экспоненциальное сглаживание
         smoothed_data = np.exp(alpha * normalized_data) / np.exp(alpha)

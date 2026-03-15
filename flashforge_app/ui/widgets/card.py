@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QEasingCurve, Property, QPropertyAnimation, Qt
-from PySide6.QtGui import QColor, QPainter, QPen
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 
 class CardWidget(QWidget):
-    """
-    Elevated information card with subtle glow and hover animation.
-    """
+    """Lightweight information card styled entirely via QSS."""
 
     def __init__(
         self,
@@ -21,15 +18,10 @@ class CardWidget(QWidget):
     ) -> None:
         super().__init__(parent)
         self.setObjectName("Card")
-        self._accent_color = QColor(accent_color)
         if accent_color != "#5C6BF5":
             self.setProperty("variant", "accent")
         self.setAttribute(Qt.WA_StyledBackground, True)
-
-        self._hover_progress = 0.0
-        self._hover_animation = QPropertyAnimation(self, b"hoverProgress", self)
-        self._hover_animation.setDuration(220)
-        self._hover_animation.setEasingCurve(QEasingCurve.InOutSine)
+        self.setAttribute(Qt.WA_Hover)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(12, 10, 12, 10) if compact else layout.setContentsMargins(16, 14, 16, 14)
@@ -56,48 +48,6 @@ class CardWidget(QWidget):
         if not compact:
             layout.addStretch(1)
 
-        self.setAttribute(Qt.WA_Hover)
-
-    def paintEvent(self, event) -> None:
-        super().paintEvent(event)
-        if self._hover_progress <= 0:
-            return
-
-        radius = 18
-        pen = QPen(QColor(self._accent_color))
-        pen.setWidth(2)
-        pen.setColor(self._accent_color)
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(pen)
-        painter.setOpacity(0.2 * self._hover_progress)
-        rect = self.rect().adjusted(2, 2, -2, -2)
-        painter.drawRoundedRect(rect, radius, radius)
-        painter.end()
-
-    def enterEvent(self, event) -> None:
-        self._animate_to(1.0)
-        super().enterEvent(event)
-
-    def leaveEvent(self, event) -> None:
-        self._animate_to(0.0)
-        super().leaveEvent(event)
-
-    def _animate_to(self, value: float) -> None:
-        self._hover_animation.stop()
-        self._hover_animation.setStartValue(self._hover_progress)
-        self._hover_animation.setEndValue(value)
-        self._hover_animation.start()
-
-    def getHoverProgress(self) -> float:
-        return self._hover_progress
-
-    def setHoverProgress(self, value: float) -> None:
-        self._hover_progress = value
-        self.update()
-
-    hoverProgress = Property(float, getHoverProgress, setHoverProgress)
-
     # ------------------------------------------------------------------ public API
     def set_title(self, text: str) -> None:
         self._title_label.setText(text)
@@ -119,9 +69,15 @@ class CardWidget(QWidget):
             self._subtitle_label.show()
 
     def set_value_font(self, point_size: int) -> None:
+        if point_size <= 0:
+            return
         font = self._value_label.font()
         font.setPointSize(point_size)
         self._value_label.setFont(font)
 
     def reset_value_font(self) -> None:
-        self._value_label.setFont(self._default_value_font)
+        font = self._default_value_font
+        if font.pointSize() <= 0:
+            font = self._value_label.font()
+            font.setPointSize(max(font.pointSize(), 1))
+        self._value_label.setFont(font)
