@@ -1,4 +1,4 @@
-"""Data models used by the calibration workflow engine."""
+# Data models used by the calibration workflow engine
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import numpy as np
 
 @dataclass
 class StageAction:
-    """Single actionable step for a calibration stage."""
+    # Single actionable step for a calibration stage
 
     kind: str  # e.g. 'belt', 'screw', 'tape', 'info'
     identifier: str
@@ -25,7 +25,7 @@ class StageAction:
 
 @dataclass
 class StageResult:
-    """Result of one calibration stage."""
+    # Result of one calibration stage
 
     key: str
     label: str
@@ -42,7 +42,7 @@ class StageResult:
 
 @dataclass
 class WorkflowData:
-    """Aggregated calibration workflow information."""
+    # Aggregated calibration workflow information
 
     stages: List[StageResult]
     best_stage: StageResult

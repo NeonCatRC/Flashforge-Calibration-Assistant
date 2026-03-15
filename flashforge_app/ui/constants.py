@@ -1,4 +1,4 @@
-"""Named constants for the UI layer."""
+# Named constants for the UI layer
 
 SIDEBAR_WIDTH = 220
 SPACING_SM, SPACING_MD, SPACING_LG = 8, 12, 16

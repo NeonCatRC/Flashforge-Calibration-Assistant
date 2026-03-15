@@ -1,6 +1,4 @@
-"""
-Reusable UI widgets for the Flashforge Assistant.
-"""
+# Reusable UI widgets for the Flashforge Assistant
 
 from .animated_stack import AnimatedStackedWidget  # noqa: F401
 from .card import CardWidget  # noqa: F401

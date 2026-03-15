@@ -10,7 +10,7 @@ from flashforge_app.services.localization import LocalizationService
 
 
 class AuthorDialog(QDialog):
-    """Informational dialog with author details and a small easter egg."""
+    # Informational dialog with author details and a small easter egg
 
     _TARGET_CLICKS = 15
 

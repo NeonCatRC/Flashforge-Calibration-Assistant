@@ -1,4 +1,4 @@
-"""High level orchestration for calibration workflow computations."""
+# High level orchestration for calibration workflow computations
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def compute_workflow(
     tape_calculator: TapeCalculator,
     settings: Dict,
 ) -> WorkflowData:
-    """Compose stage-by-stage calibration results for UI consumption."""
+    # Compose stage-by-stage calibration results for UI consumption
     workflow_flags = {
         **DEFAULT_WORKFLOW_FLAGS,
         **settings.get('workflow', {}),

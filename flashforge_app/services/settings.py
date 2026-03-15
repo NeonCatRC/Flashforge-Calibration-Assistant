@@ -118,9 +118,7 @@ class ApplicationSettings:
 
 
 class SettingsService:
-    """
-    Provides read/write access to persistent application settings.
-    """
+    # Provides read/write access to persistent application settings
 
     def __init__(self, storage_path: Path = SETTINGS_PATH) -> None:
         self.storage_path = storage_path

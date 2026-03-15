@@ -27,7 +27,7 @@ GITHUB_RELEASE_URL = "https://github.com/lDOCI/Flashforge-Calibration-Assistant-
 
 
 class SettingsView(QWidget):
-    """Editable settings form grouped by categories."""
+    # Editable settings form grouped by categories
 
     def __init__(
         self,

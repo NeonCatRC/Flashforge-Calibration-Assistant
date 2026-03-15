@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-PySide6 dialog that presents visual recommendations for bed leveling.
-
-The dialog integrates tightly with the Qt-based workflow and relies on the
-animated visualizers from ``visualization.bed_mesh.animated_recommendations``.
-"""
+# PySide6 dialog for visual bed leveling recommendations
 
 from __future__ import annotations
 
@@ -49,13 +44,7 @@ from visualization.bed_mesh.animated_recommendations import (
 
 
 class VisualRecommendationsDialog(QDialog):
-    """
-    Диалог визуальных рекомендаций с оптимизированной компоновкой:
-
-    • Увеличенная область визуализации
-    • Компактное расположение метрик и действий
-    • Улучшенная анимация винтов (как в референсе)
-    """
+    # Диалог визуальных рекомендаций с оптимизированной компоновкой
 
     def __init__(
         self,
@@ -312,7 +301,7 @@ class VisualRecommendationsDialog(QDialog):
             self.metric_widgets["improvement"].setText("—")
 
     def _format_thermal_lines(self, stage: StageResult) -> list[str]:
-        """Thermal-model info lines shared between stage meta and hints."""
+        # Thermal-model info lines shared between stage meta and hints
         tr = self.localization.translate
         model = self._active_thermal_model()
         info = stage.metadata or {}
@@ -439,7 +428,7 @@ class VisualRecommendationsDialog(QDialog):
             QTimer.singleShot(100, lambda: self._start_animation(animator))
 
     def _start_animation(self, animator: animation.FuncAnimation) -> None:
-        """Drive the matplotlib animation via a QTimer for reliable Qt repaints."""
+        # Drive the matplotlib animation via a QTimer for reliable Qt repaints
         if not animator or not self.figure_canvas:
             return
         try:

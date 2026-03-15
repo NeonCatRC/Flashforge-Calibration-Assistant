@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""
-Flashforge Calibration Assistant (PySide6 edition).
-
-This module boots the redesigned application with improved modularity and UI.
-"""
+# Flashforge Calibration Assistant (PySide6 edition)
 
 from __future__ import annotations
 

@@ -178,7 +178,7 @@ class _AxisInfo(QFrame):
 
 
 class InputShaperView(QWidget):
-    """PySide6 implementation of the legacy Input Shaper layout."""
+    # PySide6 implementation of the Input Shaper layout
 
     csv_loaded = Signal(Path)
 
@@ -391,7 +391,7 @@ class InputShaperView(QWidget):
 
     # ------------------------------------------------------------------ data handling
     def load_csv_files(self, files: list[Path]) -> None:
-        """Load multiple CSV files, ordering by axis (X first, then Y, then unknown)."""
+        # Load multiple CSV files, ordering by axis (X first, then Y, then unknown)
         ordered: list[Path] = []
         for axis in ('x', 'y'):
             ordered.extend(f for f in files if self._infer_axis_from_filename(f) == axis)
@@ -448,9 +448,7 @@ class InputShaperView(QWidget):
 
     @staticmethod
     def _map_firmware_axis(axis: str) -> str:
-        """
-        Flashforge прошивки путают X/Y, поэтому для UI меняем оси местами.
-        """
+        # Flashforge прошивки путают X/Y, поэтому для UI меняем оси местами
         if axis == 'x':
             return 'y'
         if axis == 'y':

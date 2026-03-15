@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 
 
 class TopBar(QFrame):
-    """Header toolbar with search, quick actions, and status display."""
+    # Header toolbar with search, quick actions, and status display
 
     theme_toggle_requested = Signal()
     language_selected = Signal(str)

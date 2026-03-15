@@ -1,9 +1,4 @@
-"""
-Flashforge Calibration Assistant - PySide6 application package.
-
-This package hosts the redesigned application architecture with clear
-separation between core logic, services, and UI layers.
-"""
+# Flashforge Calibration Assistant - PySide6 application package
 
 __all__ = [
     "create_app",

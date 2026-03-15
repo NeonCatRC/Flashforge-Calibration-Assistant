@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Визуализации рекомендаций по регулировке стола для Qt-интерфейса.
-
-Модуль реализует две фигуры matplotlib:
-* ScrewAdjustmentVisualizer — анимация регулировки винтов с подсказками
-* TapeLayoutVisualizer — схема наклейки скотча с легендой и инструкциями
-"""
+# Визуализации рекомендаций по регулировке стола для Qt-интерфейса
+# ScrewAdjustmentVisualizer — анимация регулировки винтов с подсказками
+# TapeLayoutVisualizer — схема наклейки скотча с легендой и инструкциями
 
 from __future__ import annotations
 
@@ -38,7 +34,7 @@ def _noop_tr(key: str, default: Optional[str] = None) -> str:
 
 
 def _draw_ok_marker(ax, x: float, y: float, bed_size: float, text: str) -> None:
-    """Draw a ✓ checkmark and label at (x, y)."""
+    # Draw a checkmark and label at (x, y)
     ax.text(x, y, "✓", ha='center', va='center',
             fontsize=20, fontweight='bold', color=_OK_COLOR)
     ax.text(x, y + bed_size / 6, text, ha='center', va='center',
@@ -86,7 +82,7 @@ def _finalize_axes(ax, fig, bed_size: float, margin: float = 4.0) -> None:
 
 
 class ScrewAdjustmentVisualizer:
-    """Создает фигуру с визуализацией винтов и анимацией дуг."""
+    # Создает фигуру с визуализацией винтов и анимацией дуг
 
     def __init__(
         self,
@@ -121,7 +117,7 @@ class ScrewAdjustmentVisualizer:
             return f"{template} {mode_text}"
 
     def _setup_axes(self) -> Tuple[Figure, object, str, str, str]:
-        """Create figure and axes with theme colours. Returns (fig, ax, text_color, panel_bg, edge_color)."""
+        # Create figure and axes with theme colours
         mc = mpl_colors("dark" if self.is_dark_theme else "light")
 
         fig = Figure(figsize=(12.0, 9.6), dpi=110)
@@ -160,7 +156,7 @@ class ScrewAdjustmentVisualizer:
         self,
         adjustments: Dict[str, Tuple[float, RotationDirection]],
     ) -> Figure:
-        """Builds screw-adjustment figure with wedge animations."""
+        # Builds screw-adjustment figure with wedge animations
         fig, ax, text_color, panel_bg, edge_color = self._setup_axes()
         ax.set_title(self._mode_caption(), color=text_color,
                      fontsize=12, fontweight='bold', pad=12)
@@ -224,7 +220,7 @@ class ScrewAdjustmentVisualizer:
         self,
         adjustments: Dict[str, Dict[str, object]],
     ) -> Figure:
-        """Builds belt shaft adjustment figure with wedge animations."""
+        # Builds belt shaft adjustment figure with wedge animations
         fig, ax, text_color, panel_bg, edge_color = self._setup_axes()
         ax.set_title("", color=text_color)
 
@@ -350,7 +346,7 @@ class TapeCell:
 
 
 class TapeLayoutVisualizer:
-    """Визуализация схемы наклейки скотча."""
+    # Визуализация схемы наклейки скотча
 
     def __init__(self, *, translator: Optional[Translator], is_dark_theme: bool) -> None:
         self._tr = translator or _noop_tr

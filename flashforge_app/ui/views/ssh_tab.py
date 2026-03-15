@@ -25,7 +25,7 @@ from flashforge_app.state import AppState
 
 
 class _SSHWorker(QObject):
-    """Runs SSH operations off the main thread."""
+    # Runs SSH operations off the main thread
 
     log = Signal(str)
     config_ready = Signal(Path)
@@ -116,7 +116,7 @@ class _SSHWorker(QObject):
 
 
 class SSHTab(QWidget):
-    """Dedicated SSH tab for testing connection and downloading files."""
+    # Dedicated SSH tab for testing connection and downloading files
 
     config_downloaded = Signal(Path)
     shaper_files_downloaded = Signal(list)

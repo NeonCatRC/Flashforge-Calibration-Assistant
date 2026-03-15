@@ -14,7 +14,7 @@ _template_cache: str | None = None
 
 
 def apply_theme(app: QApplication, theme: str = "dark") -> None:
-    """Generate QSS from the palette template and apply it."""
+    # Generate QSS from the palette template and apply it
     _load_fonts()
     if theme not in {"dark", "light"}:
         theme = "dark"
@@ -33,7 +33,7 @@ def apply_theme(app: QApplication, theme: str = "dark") -> None:
 
 
 def _load_fonts() -> None:
-    """Attempt to load bundled fonts; quietly ignore if unavailable."""
+    # Attempt to load bundled fonts; quietly ignore if unavailable
     fonts_dir = THEME_DIR / "fonts"
     if not fonts_dir.exists():
         return

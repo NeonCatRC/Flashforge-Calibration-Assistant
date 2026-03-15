@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Модуль для визуализации 2D тепловой карты стола принтера.
-"""
+# Модуль для визуализации 2D тепловой карты стола принтера
 
 from typing import Callable, Optional
 
@@ -19,7 +17,7 @@ def _noop_translator(key: str, default: Optional[str] = None) -> str:
 
 
 class BedMeshHeatmap:
-    """Класс для отображения 2D тепловой карты стола."""
+    # Класс для отображения 2D тепловой карты стола
 
     def __init__(self, is_dark_theme: bool = False, translator: Optional[Translator] = None):
         self.mesh_data = None
@@ -30,7 +28,7 @@ class BedMeshHeatmap:
 
     # ------------------------------------------------------------------ service helpers
     def set_translator(self, translator: Optional[Translator]) -> None:
-        """Устанавливает функцию перевода, совместимую с LocalizationService."""
+        # Устанавливает функцию перевода, совместимую с LocalizationService
         if translator is None:
             self._translator = _noop_translator
         else:
@@ -40,31 +38,21 @@ class BedMeshHeatmap:
         return self._translator(key, default)
         
     def set_mesh_data(self, mesh_data: np.ndarray) -> None:
-        """
-        Установка данных сетки и расчет максимального отклонения
-        
-        Args:
-            mesh_data: Данные сетки стола
-        """
+        # Установка данных сетки и расчет максимального отклонения
         self.mesh_data = mesh_data
         self.max_delta = float(np.max(self.mesh_data) - np.min(self.mesh_data))
         
     def set_theme(self, is_dark_theme: bool) -> None:
-        """
-        Установка темы
-        
-        Args:
-            is_dark_theme: Использовать ли темную тему
-        """
+        # Установка темы
         self.is_dark_theme = is_dark_theme
 
     def set_figsize(self, width: float, height: float) -> None:
-        """Override default figure size (in inches)."""
+        # Override default figure size (in inches)
         if width > 0 and height > 0:
             self.figsize = (width, height)
 
     def create_2d_figure(self) -> Figure:
-        """Создание фигуры с 2D тепловой картой."""
+        # Создание фигуры с 2D тепловой картой
         if self.mesh_data is None:
             return None
 

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Palette:
-    """Centralised theme colours — the single source of truth for the entire app."""
+    # Centralised theme colours — the single source of truth for the entire app
 
     # Background hierarchy
     background: str
@@ -101,13 +101,13 @@ LIGHT = Palette(
 )
 
 
+# Return the palette for the given theme name
 def get_palette(theme: str = "dark") -> Palette:
-    """Return the palette for the given theme name."""
     return DARK if theme == "dark" else LIGHT
 
 
+# Return a dict of matplotlib-compatible colour strings
 def mpl_colors(theme: str = "dark") -> dict[str, str]:
-    """Return a dict of matplotlib-compatible colour strings."""
     p = get_palette(theme)
     return {
         "bg": p.mpl_bg,

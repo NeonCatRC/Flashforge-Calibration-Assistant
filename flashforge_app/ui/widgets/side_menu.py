@@ -9,9 +9,7 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 
 class SideMenu(QListWidget):
-    """
-    Styled side navigation with icons and selection signals.
-    """
+    # Styled side navigation with icons and selection signals
 
     activated = Signal(str)
 

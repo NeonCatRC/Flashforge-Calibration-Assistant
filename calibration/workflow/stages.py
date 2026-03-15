@@ -1,4 +1,4 @@
-"""Compatibility wrapper for legacy imports."""
+# Compatibility wrapper for legacy imports
 
 from __future__ import annotations
 

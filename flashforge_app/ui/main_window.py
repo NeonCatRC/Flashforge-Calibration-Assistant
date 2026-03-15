@@ -32,7 +32,7 @@ from flashforge_app.ui.theme import apply_theme
 
 
 class MainWindow(QMainWindow):
-    """Main window combining navigation, top bar, and functional views."""
+    # Main window combining navigation, top bar, and functional views
 
     def __init__(
         self,

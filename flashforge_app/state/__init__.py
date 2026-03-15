@@ -1,6 +1,4 @@
-"""
-Application state container that bridges backend logic with UI views.
-"""
+# Application state container that bridges backend logic with UI views
 
 from __future__ import annotations
 
@@ -35,9 +33,7 @@ class BedWorkspace:
 
 
 class AppState:
-    """
-    Coordinates persistent services and runtime data used across views.
-    """
+    # Coordinates persistent services and runtime data used across views
 
     def __init__(self, settings_service: SettingsService) -> None:
         self.settings_service = settings_service

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Модуль для 3D визуализации поверхности стола принтера.
-"""
+# Модуль для 3D визуализации поверхности стола принтера
 
 from typing import Callable, Optional
 
@@ -22,15 +20,10 @@ def _noop_translator(key: str, default: Optional[str] = None) -> str:
 
 
 class BedMesh3D:
-    """Класс для отображения 3D визуализации стола."""
+    # Класс для отображения 3D визуализации стола
 
     def __init__(self, is_dark_theme: bool = False, translator: Optional[Translator] = None):
-        """
-        Инициализация визуализатора
-        
-        Args:
-            is_dark_theme: Использовать ли темную тему
-        """
+        # Инициализация визуализатора
         self.mesh_data = None
         self.max_delta = None
         self.is_dark_theme = is_dark_theme
@@ -42,7 +35,7 @@ class BedMesh3D:
 
     # ------------------------------------------------------------------ service helpers
     def set_translator(self, translator: Optional[Translator]) -> None:
-        """Устанавливает функцию перевода, совместимую с LocalizationService."""
+        # Устанавливает функцию перевода, совместимую с LocalizationService
         if translator is None:
             self._translator = _noop_translator
         else:
@@ -52,12 +45,7 @@ class BedMesh3D:
         return self._translator(key, default)
         
     def set_mesh_data(self, mesh_data: np.ndarray) -> None:
-        """
-        Установка данных сетки и расчет максимального отклонения
-        
-        Args:
-            mesh_data: Данные сетки стола
-        """
+        # Установка данных сетки и расчет максимального отклонения
         self.mesh_data = mesh_data
         self.max_delta = float(np.max(self.mesh_data) - np.min(self.mesh_data))
         self._interp_cache = None
@@ -65,21 +53,11 @@ class BedMesh3D:
 
 
     def set_theme(self, is_dark_theme: bool) -> None:
-        """
-        Установка темы
-        
-        Args:
-            is_dark_theme: Использовать ли темную тему
-        """
+        # Установка темы
         self.is_dark_theme = is_dark_theme
         
     def set_interpolation_factor(self, factor: int) -> None:
-        """
-        Установка фактора интерполяции
-
-        Args:
-            factor: Фактор интерполяции (количество точек сетки после интерполяции)
-        """
+        # Установка фактора интерполяции
         if factor > 0:
             self.interpolation_factor = factor
 
@@ -88,12 +66,7 @@ class BedMesh3D:
             self.figsize = (width, height)
 
     def create_3d_figure(self) -> Figure:
-        """
-        Создание фигуры с 3D визуализацией стола
-        
-        Returns:
-            Figure: Объект фигуры matplotlib с 3D визуализацией
-        """
+        # Создание фигуры с 3D визуализацией стола
         if self.mesh_data is None:
             return None
         
@@ -212,16 +185,7 @@ class BedMesh3D:
         return fig
 
     def create_comparison_figure(self, before_mesh: np.ndarray, after_mesh: np.ndarray) -> Figure:
-        """
-        Создание фигуры с сравнением двух поверхностей (до и после регулировки)
-        
-        Args:
-            before_mesh: Сетка до регулировки
-            after_mesh: Сетка после регулировки
-            
-        Returns:
-            Figure: Объект фигуры matplotlib с 3D визуализацией сравнения
-        """
+        # Создание фигуры с сравнением двух поверхностей (до и после регулировки)
         if before_mesh is None or after_mesh is None:
             return None
             

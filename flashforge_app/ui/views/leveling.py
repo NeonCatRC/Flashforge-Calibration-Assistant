@@ -28,7 +28,7 @@ from visualization.bed_mesh.surface_3d import BedMesh3D
 
 
 class BedLevelingView(QWidget):
-    """Workspace responsible for bed mesh analysis and recommendations."""
+    # Workspace responsible for bed mesh analysis and recommendations
 
     load_printer_requested = Signal()
     visual_recommendations_requested = Signal()

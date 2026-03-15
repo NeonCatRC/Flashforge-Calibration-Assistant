@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Модуль для расчета оптимальных регулировок винтов
-"""
+# Модуль для расчета оптимальных регулировок винтов
 
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional
@@ -12,7 +10,7 @@ from ..hardware.screw import Screw, RotationDirection, ScrewConfig
 
 @dataclass
 class ScrewAdjustment:
-    """Информация о регулировке винта"""
+    # Информация о регулировке винта
 
     corner: str
     minutes: float
@@ -30,21 +28,21 @@ class ScrewSolver:
         self._build_screws()
         self._compute_corner_weights()
 
+    # (Re)create screw instances with the current configuration
     def _build_screws(self) -> None:
-        """(Re)create screw instances with the current configuration."""
         self.screws = {
             corner: Screw(corner, self.screw_config)
             for corner in self.bed.corners.keys()
         }
 
+    # Update screw configuration and rebuild screw instances
     def set_screw_config(self, screw_config: ScrewConfig) -> None:
-        """Update screw configuration and rebuild screw instances."""
         self.screw_config = screw_config
         self._build_screws()
         self._compute_corner_weights()
 
+    # Pre-compute bilinear weight maps for each corner
     def _compute_corner_weights(self) -> None:
-        """Pre-compute bilinear weight maps for each corner."""
         rows = self.bed.config.mesh_points_x
         cols = self.bed.config.mesh_points_y
         if rows < 2 or cols < 2:
@@ -69,9 +67,9 @@ class ScrewSolver:
             correction = np.where(total_weight != 0, 1.0 / total_weight, 0)
         for corner in self.corner_weights:
             self.corner_weights[corner] = self.corner_weights[corner] * correction
-        
+
+    # Определение приоритета регулировки на основе отклонения
     def _calculate_priority(self, deviation: float) -> int:
-        """Определение приоритета регулировки на основе отклонения"""
         if deviation > 0.4:
             return 1  # Высший приоритет
         elif deviation > 0.3:
@@ -80,29 +78,21 @@ class ScrewSolver:
             return 3
         return 4  # Низший приоритет
 
+    # Расчет необходимых регулировок винтов
     def calculate_adjustments(self, ideal_plane: np.ndarray) -> List[ScrewAdjustment]:
-        """
-        Расчет необходимых регулировок винтов
-        
-        Args:
-            ideal_plane: Идеальная плоскость для выравнивания
-            
-        Returns:
-            List[ScrewAdjustment]: Список регулировок, отсортированный по приоритету
-        """
         adjustments = []
-        
+
         for corner, (x, y) in self.bed.corners.items():
             current_height = self.bed.get_corner_height(corner)
             target_height = ideal_plane[x, y]
-            
+
             screw = self.screws[corner]
             minutes, direction = screw.calculate_adjustment(current_height, target_height)
-            
+
             if minutes > 0:
                 deviation = abs(current_height - target_height)
                 priority = self._calculate_priority(deviation)
-                
+
                 adjustments.append(ScrewAdjustment(
                     corner=corner,
                     minutes=minutes,
@@ -113,24 +103,19 @@ class ScrewSolver:
                     priority=priority,
                     turns=minutes / 60.0,
                 ))
-                
+
         # Сортируем по приоритету и величине отклонения
         return sorted(
             adjustments,
             key=lambda x: (x.priority, -abs(x.current_height - x.target_height))
         )
 
+    # Симуляция применения одной регулировки
     def simulate_adjustment(
         self,
         adjustment: ScrewAdjustment,
         base_mesh: Optional[np.ndarray] = None,
     ) -> np.ndarray:
-        """
-        Симуляция применения одной регулировки
-
-        Returns:
-            np.ndarray: Новое состояние сетки после регулировки
-        """
         mesh_source = self.bed.mesh_data if base_mesh is None else base_mesh
         if mesh_source is None:
             raise ValueError("Mesh data is not available for simulation")
@@ -150,12 +135,12 @@ class ScrewSolver:
 
         return simulated_mesh
 
+    # Последовательная симуляция списка регулировок
     def simulate_sequence(
         self,
         adjustments: List[ScrewAdjustment],
         base_mesh: Optional[np.ndarray] = None,
     ) -> np.ndarray:
-        """Последовательная симуляция списка регулировок."""
         mesh_source = self.bed.mesh_data if base_mesh is None else base_mesh
         if mesh_source is None:
             raise ValueError("Mesh data is not available for simulation")
@@ -165,19 +150,14 @@ class ScrewSolver:
             simulated_mesh = self.simulate_adjustment(adjustment, simulated_mesh)
         return simulated_mesh
 
+    # Генерация последовательности инструкций для регулировки
     def get_adjustment_sequence(self, adjustments: List[ScrewAdjustment]) -> List[str]:
-        """
-        Генерация последовательности инструкций для регулировки
-        
-        Returns:
-            List[str]: Список инструкций в порядке выполнения
-        """
         instructions = []
-        
+
         for adj in adjustments:
             # Формируем текст направления
             direction_text = "по часовой стрелке" if adj.direction == RotationDirection.CLOCKWISE else "против часовой стрелки"
-            
+
             # Формируем основную инструкцию
             instruction = (
                 f"{adj.corner}:\n"
@@ -186,27 +166,22 @@ class ScrewSolver:
                 f"• Поверните винт {direction_text} "
                 f"на {int(round(adj.minutes))} минут ({int(round(adj.degrees))}°)\n"
             )
-            
+
             # Добавляем пометку о приоритете если высокий
             if adj.priority == 1:
                 instruction += "❗ Высокий приоритет - выполнить в первую очередь\n"
-                
+
             instructions.append(instruction)
-            
+
         return instructions
 
+    # Оценка общего улучшения после всех регулировок
     def estimate_total_improvement(self, adjustments: List[ScrewAdjustment]) -> float:
-        """
-        Оценка общего улучшения после всех регулировок
-        
-        Returns:
-            float: Уменьшение максимального отклонения в мм
-        """
         current_mesh = self.bed.mesh_data
         simulated_mesh = self.simulate_sequence(adjustments, current_mesh)
-            
+
         # Считаем улучшение
         current_deviation = np.max(np.abs(current_mesh - np.mean(current_mesh)))
         simulated_deviation = np.max(np.abs(simulated_mesh - np.mean(simulated_mesh)))
-        
+
         return current_deviation - simulated_deviation

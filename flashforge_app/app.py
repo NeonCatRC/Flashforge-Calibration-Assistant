@@ -15,9 +15,7 @@ from flashforge_app.ui.theme import apply_theme
 
 
 class FlashforgeApplication:
-    """
-    Application bootstrapper responsible for wiring services and UI.
-    """
+    # Application bootstrapper responsible for wiring services and UI
 
     def __init__(self, argv: Optional[list[str]] = None) -> None:
         self._argv = argv or sys.argv
@@ -27,10 +25,8 @@ class FlashforgeApplication:
         self.app_state: AppState | None = None
         self.main_window: Optional[MainWindow] = None
 
+    # Prepare services and build the main application window
     def initialise(self) -> None:
-        """
-        Prepare services and build the main application window.
-        """
         settings = self.settings_service.load()
         if settings.language:
             self.localization_service.set_language(settings.language)
@@ -47,10 +43,8 @@ class FlashforgeApplication:
         self.main_window.resize(1280, 840)
         self._apply_branding()
 
+    # Configure application-wide branding and icons
     def _apply_branding(self) -> None:
-        """
-        Configure application-wide branding and icons.
-        """
         app_icon_path = Path(__file__).resolve().parent / "ui" / "assets" / "icons" / "app.svg"
         if app_icon_path.exists():
             icon = QIcon(str(app_icon_path))
@@ -61,10 +55,8 @@ class FlashforgeApplication:
         self.qt_app.setApplicationName("Flashforge Calibration Assistant")
         self.qt_app.setApplicationDisplayName("Flashforge Calibration Assistant")
 
+    # Start the Qt event loop
     def run(self) -> int:
-        """
-        Start the Qt event loop.
-        """
         if self.main_window is None:
             self.initialise()
 
@@ -73,10 +65,8 @@ class FlashforgeApplication:
         return self.qt_app.exec()
 
 
+# Factory for the flashforge application
 def create_app(argv: Optional[list[str]] = None) -> FlashforgeApplication:
-    """
-    Factory for the flashforge application.
-    """
     app = FlashforgeApplication(argv)
     app.initialise()
     return app

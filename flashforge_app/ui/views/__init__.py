@@ -1,6 +1,4 @@
-"""
-Collection of PySide6 view widgets used by the main window.
-"""
+# PySide6 view widgets used by the main window
 
 from .leveling import BedLevelingView  # noqa: F401
 from .input_shaper import InputShaperView  # noqa: F401

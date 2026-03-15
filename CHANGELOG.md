@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.1.0 — UI Overhaul (2026-03-15)
+## v3.0 — UI Overhaul (2026-03-15)
 
 Major UI refactoring focused on code simplification, deduplication, and theme centralization.
 Mathematical and calibration modules are untouched.

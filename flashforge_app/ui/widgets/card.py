@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 
 class CardWidget(QWidget):
-    """Lightweight information card styled entirely via QSS."""
+    # Lightweight information card styled entirely via QSS
 
     def __init__(
         self,

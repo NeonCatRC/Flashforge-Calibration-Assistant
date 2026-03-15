@@ -1,4 +1,4 @@
-"""Stage calculators that encapsulate calibration logic."""
+# Stage calculators that encapsulate calibration logic
 
 from __future__ import annotations
 
@@ -20,12 +20,12 @@ BACK_SHAFT_GAIN = 0.4
 
 
 def compute_stage_deviation(mesh: np.ndarray) -> float:
-    """Return the total height span (max - min) to match UI deviation metrics."""
+    # Return the total height span (max - min) to match UI deviation metrics
     return float(np.max(mesh) - np.min(mesh))
 
 
 def compute_initial_stage(mesh: np.ndarray) -> StageResult:
-    """Assemble the initial stage before any corrections."""
+    # Assemble the initial stage before any corrections
     deviation = compute_stage_deviation(mesh)
     return StageResult(
         key='initial',
@@ -53,7 +53,7 @@ def _format_corner_name(side: str) -> str:
 
 
 def _build_corner_weights(solver: ScrewSolver) -> Dict[str, np.ndarray]:
-    """Reuse solver-provided weights or create smooth falloff maps."""
+    # Reuse solver-provided weights or create smooth falloff maps
     if getattr(solver, 'corner_weights', None):
         return solver.corner_weights
 
@@ -206,7 +206,7 @@ def build_belt_stage(
     mesh_before: np.ndarray,
     enabled_flag: bool,
 ) -> Tuple[StageResult, np.ndarray]:
-    """Compute the belt stage, returning the result and updated mesh."""
+    # Compute the belt stage, returning the result and updated mesh
     baseline = compute_stage_deviation(mesh_before)
 
     if not enabled_flag:

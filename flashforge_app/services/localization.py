@@ -23,10 +23,7 @@ class LanguageDefinition:
 
 
 class LocalizationService:
-    """
-    Loads translation catalogues from the `languages/` directory and provides
-    convenient access to text resources across the UI.
-    """
+    # Loads translation catalogues from languages/ and provides access to text resources
 
     def __init__(self, languages_dir: Path | str | None = None, default_language: str = "en") -> None:
         if languages_dir is None:

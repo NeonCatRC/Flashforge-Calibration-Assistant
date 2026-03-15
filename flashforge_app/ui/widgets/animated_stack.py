@@ -5,14 +5,9 @@ from PySide6.QtWidgets import QGraphicsOpacityEffect, QStackedWidget, QWidget
 
 
 class AnimatedStackedWidget(QStackedWidget):
-    """
-    QStackedWidget with cross-fade animation between pages.
-
-    The QGraphicsOpacityEffect is only enabled during transitions.
-    Keeping it enabled permanently would force Qt to render every child
-    widget into an offscreen pixmap, which blocks mouse events on
-    interactive controls (QCheckBox, QRadioButton, QComboBox, etc.).
-    """
+    # QStackedWidget with cross-fade animation between pages.
+    # QGraphicsOpacityEffect is only enabled during transitions —
+    # keeping it permanent blocks mouse events on interactive controls.
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
